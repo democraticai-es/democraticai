@@ -3,134 +3,1359 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DemocraticAI — Navegación</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<title>DemocraticAI — Transparencia para la democracia española</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:#0f0e0c;color:#f5f0e8;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;}
-body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:.35;pointer-events:none;z-index:0;}
+  :root {
+    --ink: #0f0e0c;
+    --paper: #f5f0e8;
+    --red: #c0392b;
+    --red-dim: #8b2a1f;
+    --red-bright: #e74c3c;
+    --gold: #c9a84c;
+    --muted: #6b6560;
+    --rule: rgba(15,14,12,0.12);
+    --mono: 'DM Mono', monospace;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'DM Sans', sans-serif;
+  }
 
-.hub{position:relative;z-index:1;max-width:720px;width:100%;}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-.logo{display:flex;align-items:center;gap:12px;margin-bottom:48px;justify-content:center;}
-.logo-mark{width:28px;height:28px;background:#c0392b;border-radius:4px;display:flex;align-items:center;justify-content:center;}
-.logo-mark svg{width:14px;height:14px;}
-.logo-text{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#f5f0e8;}
-.logo-text em{color:#c0392b;font-style:normal;}
+  html { scroll-behavior: smooth; }
 
-.hub-title{font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,42px);font-weight:900;line-height:1.1;letter-spacing:-.02em;text-align:center;margin-bottom:12px;}
-.hub-title em{font-style:italic;color:rgba(245,240,232,.35);}
-.hub-sub{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#6b6560;text-align:center;margin-bottom:48px;}
+  body {
+    font-family: var(--sans);
+    background: var(--ink);
+    color: var(--paper);
+    overflow-x: hidden;
+  }
 
-.pages{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px;}
+  /* ── NOISE TEXTURE ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
+  }
 
-.page-card{background:rgba(245,240,232,.03);border:1px solid rgba(245,240,232,.08);border-radius:6px;padding:24px;text-decoration:none;transition:all .2s;display:block;position:relative;overflow:hidden;}
-.page-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent,#c0392b);transform:scaleX(0);transition:transform .2s;}
-.page-card:hover{border-color:rgba(245,240,232,.2);background:rgba(245,240,232,.05);}
-.page-card:hover::before{transform:scaleX(1);}
+  /* ── MASTHEAD ── */
+  .masthead {
+    border-bottom: 1px solid var(--rule);
+    padding: 0 clamp(24px, 5vw, 80px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(15,14,12,0.97);
+    backdrop-filter: blur(12px);
+  }
 
-.page-num{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent,#c0392b);margin-bottom:10px;}
-.page-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#f5f0e8;margin-bottom:6px;line-height:1.2;}
-.page-desc{font-size:12px;color:#6b6560;line-height:1.5;margin-bottom:14px;}
-.page-tags{display:flex;flex-wrap:wrap;gap:5px;}
-.tag{font-family:'DM Mono',monospace;font-size:9px;padding:2px 7px;border-radius:2px;background:rgba(245,240,232,.06);color:rgba(245,240,232,.4);letter-spacing:.04em;}
-.page-arrow{position:absolute;top:22px;right:20px;font-family:'DM Mono',monospace;font-size:14px;color:rgba(245,240,232,.2);transition:all .2s;}
-.page-card:hover .page-arrow{color:var(--accent,#c0392b);transform:translateX(3px);}
+  .masthead-logo {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
 
-.status-row{display:flex;align-items:center;gap:6px;margin-top:12px;}
-.status-dot{width:6px;height:6px;border-radius:50%;background:#4caf50;}
-.status-label{font-family:'DM Mono',monospace;font-size:9px;color:#4caf50;letter-spacing:.06em;}
+  .masthead-logo .mark {
+    width: 22px;
+    height: 22px;
+    background: var(--red);
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    align-self: center;
+  }
 
-.instructions{background:rgba(245,240,232,.02);border:1px solid rgba(245,240,232,.06);border-radius:6px;padding:20px 24px;}
-.inst-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#6b6560;margin-bottom:14px;}
-.inst-steps{display:flex;flex-direction:column;gap:8px;}
-.inst-step{display:flex;align-items:flex-start;gap:12px;font-size:12px;color:rgba(245,240,232,.55);line-height:1.5;}
-.inst-step-num{font-family:'DM Mono',monospace;font-size:9px;color:#c9a84c;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);padding:1px 6px;border-radius:2px;flex-shrink:0;margin-top:1px;}
-.inst-step a{color:#c9a84c;text-decoration:none;}
-.inst-step a:hover{text-decoration:underline;}
+  .masthead-logo .mark svg { width: 12px; height: 12px; }
 
-.footer-note{margin-top:24px;font-family:'DM Mono',monospace;font-size:10px;color:rgba(245,240,232,.2);text-align:center;letter-spacing:.04em;}
+  .masthead-logo .wordmark {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: -0.02em;
+    color: var(--paper);
+  }
 
-@media(max-width:560px){.pages{grid-template-columns:1fr;}}
+  .masthead-logo .wordmark span { color: var(--red); }
+
+  .masthead-nav {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    list-style: none;
+  }
+
+  .masthead-nav a {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.78);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .masthead-nav a:hover { color: var(--paper); }
+
+  .masthead-cta {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--paper);
+    background: var(--red);
+    border: none;
+    padding: 8px 18px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+  }
+
+  .masthead-cta:hover { background: var(--red-bright); }
+
+  /* ── TICKER ── */
+  .ticker {
+    background: var(--red);
+    height: 34px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+
+  .ticker-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: rgba(0,0,0,0.25);
+    padding: 0 16px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .ticker-track {
+    display: flex;
+    animation: ticker 40s linear infinite;
+    white-space: nowrap;
+  }
+
+  .ticker-track span {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 0 32px;
+    opacity: 0.92;
+  }
+
+  .ticker-track .sep {
+    opacity: 0.4;
+    padding: 0;
+  }
+
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: clamp(60px, 8vw, 120px) clamp(24px, 5vw, 80px);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+  }
+
+  .hero-left {}
+
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--red);
+  }
+
+  .hero-headline {
+    font-family: var(--serif);
+    font-size: clamp(40px, 5vw, 68px);
+    font-weight: 900;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    color: var(--paper);
+    margin-bottom: 28px;
+  }
+
+  .hero-headline em {
+    font-style: italic;
+    color: var(--red);
+  }
+
+  .hero-sub {
+    font-size: 16px;
+    line-height: 1.7;
+    color: rgba(245,240,232,0.65);
+    max-width: 420px;
+    margin-bottom: 40px;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--red);
+    color: var(--paper);
+    border: none;
+    padding: 14px 28px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-primary:hover {
+    background: var(--red-bright);
+    transform: translateY(-1px);
+  }
+
+  .btn-ghost {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: transparent;
+    color: rgba(245,240,232,0.6);
+    border: 1px solid rgba(245,240,232,0.2);
+    padding: 13px 24px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-ghost:hover {
+    border-color: rgba(245,240,232,0.5);
+    color: var(--paper);
+  }
+
+  /* ── STAT STRIP ── */
+  .hero-stats {
+    display: flex;
+    gap: 32px;
+    margin-top: 52px;
+    padding-top: 28px;
+    border-top: 1px solid var(--rule);
+    flex-wrap: wrap;
+  }
+
+  .stat-item {}
+
+  .stat-value {
+    font-family: var(--serif);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--paper);
+    line-height: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+
+  .stat-value .unit {
+    font-size: 14px;
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* ── PROMISE CARD (Hero Right) ── */
+  .hero-right {
+    position: relative;
+  }
+
+  .promise-board {
+    background: rgba(245,240,232,0.04);
+    border: 1px solid rgba(245,240,232,0.1);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .promise-board-header {
+    background: rgba(245,240,232,0.06);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(245,240,232,0.08);
+  }
+
+  .promise-board-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .live-dot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: #4caf50;
+  }
+
+  .live-dot::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    background: #4caf50;
+    border-radius: 50%;
+    animation: pulse-green 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-green {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(76,175,80,0.4); }
+    50% { opacity: 0.7; box-shadow: 0 0 0 4px rgba(76,175,80,0); }
+  }
+
+  .promise-list { padding: 8px 0; }
+
+  .promise-row {
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(245,240,232,0.05);
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+
+  .promise-row:last-child { border-bottom: none; }
+  .promise-row:hover { background: rgba(245,240,232,0.04); }
+
+  .status-pill {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 2px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .status-pill.cumplida { background: rgba(76,175,80,0.15); color: #81c784; }
+  .status-pill.proceso { background: rgba(33,150,243,0.15); color: #64b5f6; }
+  .status-pill.parcial { background: rgba(255,193,7,0.15); color: #ffd54f; }
+  .status-pill.incumplida { background: rgba(244,67,54,0.15); color: #e57373; }
+
+  .promise-text {
+    font-size: 13px;
+    line-height: 1.5;
+    color: rgba(245,240,232,0.8);
+    flex: 1;
+  }
+
+  .promise-meta {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .promise-confidence {
+    flex-shrink: 0;
+    text-align: right;
+  }
+
+  .conf-bar {
+    width: 48px;
+    height: 3px;
+    background: rgba(245,240,232,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 6px;
+    margin-left: auto;
+  }
+
+  .conf-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--gold);
+  }
+
+  .conf-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  /* ── SECTION: DASHBOARD PREVIEW ── */
+  .section {
+    padding: clamp(60px, 7vw, 100px) clamp(24px, 5vw, 80px);
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-label::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--red);
+  }
+
+  .section-headline {
+    font-family: var(--serif);
+    font-size: clamp(28px, 3.5vw, 46px);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--paper);
+    max-width: 600px;
+    margin-bottom: 16px;
+  }
+
+  .section-sub {
+    font-size: 15px;
+    color: rgba(245,240,232,0.55);
+    line-height: 1.7;
+    max-width: 520px;
+    margin-bottom: 48px;
+  }
+
+  /* ── KPI GRID ── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 32px;
+  }
+
+  .kpi-card {
+    background: rgba(245,240,232,0.03);
+    padding: 28px 24px;
+    transition: background 0.2s;
+  }
+
+  .kpi-card:hover { background: rgba(245,240,232,0.06); }
+
+  .kpi-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .kpi-number {
+    font-family: var(--serif);
+    font-size: 38px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--paper);
+    margin-bottom: 6px;
+  }
+
+  .kpi-number.red { color: var(--red); }
+  .kpi-number.green { color: #81c784; }
+  .kpi-number.gold { color: var(--gold); }
+  .kpi-number.blue { color: #64b5f6; }
+
+  .kpi-change {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .kpi-change.up { color: #81c784; }
+  .kpi-change.down { color: #e57373; }
+
+  /* ── CHART AREA ── */
+  .chart-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .chart-panel {
+    background: rgba(245,240,232,0.03);
+    border: 1px solid rgba(245,240,232,0.07);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .chart-panel-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(245,240,232,0.07);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .chart-panel-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.5);
+  }
+
+  .chart-panel-body {
+    padding: 20px;
+    position: relative;
+  }
+
+  /* ── MINI CHART: DEBT SVG ── */
+  .debt-chart-wrap { height: 180px; position: relative; }
+
+  /* ── DONUT CHART ── */
+  .donut-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 20px;
+  }
+
+  .donut-svg { width: 140px; height: 140px; }
+
+  .donut-legend {
+    width: 100%;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .legend-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: rgba(245,240,232,0.6);
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .legend-pct {
+    margin-left: auto;
+    color: var(--paper);
+  }
+
+  /* ── PROMISE TABLE ── */
+  .promise-table-wrap {
+    overflow-x: auto;
+  }
+
+  .promise-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .promise-table th {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .promise-table td {
+    padding: 14px 16px;
+    font-size: 13px;
+    color: rgba(245,240,232,0.8);
+    border-bottom: 1px solid rgba(245,240,232,0.04);
+    vertical-align: middle;
+  }
+
+  .promise-table tr:hover td { background: rgba(245,240,232,0.03); }
+
+  .party-badge {
+    font-family: var(--mono);
+    font-size: 9px;
+    padding: 3px 7px;
+    border-radius: 2px;
+    border: 1px solid rgba(245,240,232,0.15);
+    color: rgba(245,240,232,0.6);
+    white-space: nowrap;
+  }
+
+  .source-link {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--gold);
+    text-decoration: none;
+  }
+
+  .source-link:hover { text-decoration: underline; }
+
+  /* ── HOW IT WORKS ── */
+  .how-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .how-card {
+    background: rgba(245,240,232,0.02);
+    padding: 36px 28px;
+    transition: background 0.2s;
+    position: relative;
+  }
+
+  .how-card:hover { background: rgba(245,240,232,0.05); }
+
+  .how-num {
+    font-family: var(--serif);
+    font-size: 64px;
+    font-weight: 900;
+    color: rgba(245,240,232,0.04);
+    line-height: 1;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+  }
+
+  .how-icon {
+    width: 36px;
+    height: 36px;
+    background: rgba(192,57,43,0.15);
+    border: 1px solid rgba(192,57,43,0.3);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .how-icon svg { width: 16px; height: 16px; color: var(--red); }
+
+  .how-title {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--paper);
+    margin-bottom: 10px;
+  }
+
+  .how-desc {
+    font-size: 13px;
+    line-height: 1.65;
+    color: rgba(245,240,232,0.5);
+  }
+
+  .how-tech {
+    margin-top: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tech-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    padding: 3px 7px;
+    border-radius: 2px;
+    background: rgba(245,240,232,0.06);
+    color: rgba(245,240,232,0.4);
+    letter-spacing: 0.06em;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    padding: 48px clamp(24px, 5vw, 80px);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 40px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .footer-brand .wordmark {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--paper);
+    margin-bottom: 10px;
+  }
+
+  .footer-brand .wordmark span { color: var(--red); }
+
+  .footer-desc {
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--muted);
+    max-width: 260px;
+  }
+
+  .footer-col-title {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .footer-links a {
+    font-size: 13px;
+    color: rgba(245,240,232,0.5);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .footer-links a:hover { color: var(--paper); }
+
+  .footer-bottom {
+    padding: 20px clamp(24px, 5vw, 80px);
+    border-top: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .footer-bottom p {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: rgba(245,240,232,0.25);
+    letter-spacing: 0.06em;
+  }
+
+  .open-source-badge {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: #81c784;
+    border: 1px solid rgba(129,199,132,0.3);
+    padding: 4px 10px;
+    border-radius: 2px;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-eyebrow { animation: fadeUp 0.6s ease both; }
+  .hero-headline { animation: fadeUp 0.6s ease both 0.1s; }
+  .hero-sub { animation: fadeUp 0.6s ease both 0.2s; }
+  .hero-actions { animation: fadeUp 0.6s ease both 0.3s; }
+  .hero-stats { animation: fadeUp 0.6s ease both 0.4s; }
+  .promise-board { animation: fadeUp 0.6s ease both 0.2s; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; gap: 40px; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .chart-grid { grid-template-columns: 1fr; }
+    .how-grid { grid-template-columns: 1fr; }
+    .footer { grid-template-columns: 1fr; }
+    .masthead-nav { display: none; }
+  }
+
+  @media (max-width: 480px) {
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+  }
 </style>
+  <meta name="description" content="Monitorizamos cada promesa electoral, cada ley aprobada y cada euro gastado. Datos oficiales del BOE e INE, análisis de IA auditables, sin agenda política.">
+  <meta property="og:title" content="DemocraticAI — ¿Está el gobierno cumpliendo lo que prometió?">
+  <meta property="og:description" content="Monitorizamos cada promesa electoral, cada ley aprobada y cada euro gastado. Datos oficiales del BOE e INE, análisis de IA auditables, sin agenda política.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="DemocraticAI">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DemocraticAI — ¿Está el gobierno cumpliendo lo que prometió?">
+  <meta name="twitter:description" content="Monitorizamos cada promesa electoral, cada ley aprobada y cada euro gastado. Datos oficiales del BOE e INE, análisis de IA auditables, sin agenda política.">
 </head>
 <body>
-<div class="hub">
 
-  <div class="logo">
-    <div class="logo-mark">
-      <svg viewBox="0 0 14 14" fill="none"><path d="M7 1L8.8 5.2H13L9.6 7.8L10.9 12L7 9.5L3.1 12L4.4 7.8L1 5.2H5.2L7 1Z" fill="white"/></svg>
+<!-- MASTHEAD -->
+<header class="masthead">
+  <div class="masthead-logo">
+    <div class="mark">
+      <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 1L7.5 4.5H11L8.25 6.75L9.25 10L6 8L2.75 10L3.75 6.75L1 4.5H4.5L6 1Z" fill="white"/>
+      </svg>
     </div>
-    <div class="logo-text">Democratic<em>AI</em></div>
+    <span class="wordmark">Democratic<span>AI</span></span>
   </div>
+  <nav>
+    <ul class="masthead-nav">
+      <li><a href="democraticai-economia.html">Economía</a></li>
+      <li><a href="democraticai-partidos.html">Partidos</a></li>
+      <li><a href="#promesas">Promesas</a></li>
+      <li><a href="#metodologia">Metodología</a></li>
+    </ul>
+  </nav>
+  <a href="democraticai-registro.html" class="masthead-cta">Suscribirme gratis</a>
+</header>
 
-  <h1 class="hub-title">Prototipo de producto<br><em>— todas las pantallas</em></h1>
-  <p class="hub-sub">4 interfaces construidas · datos de demostración · diseño de producción</p>
-
-  <div class="pages">
-
-    <a href="democraticai.html" class="page-card" style="--accent:#c0392b">
-      <div class="page-num">01 / Landing</div>
-      <div class="page-arrow">→</div>
-      <div class="page-name">Página principal</div>
-      <div class="page-desc">Hero con la pregunta central, ticker en vivo, panel de promesas recientes y KPIs macroeconómicos.</div>
-      <div class="page-tags"><span class="tag">Ticker</span><span class="tag">Promesas</span><span class="tag">KPIs</span><span class="tag">Dashboard</span></div>
-      <div class="status-row"><div class="status-dot"></div><span class="status-label">Construido</span></div>
-    </a>
-
-    <a href="democraticai-promesa-detalle.html" class="page-card" style="--accent:#c9a84c">
-      <div class="page-num">02 / Detalle</div>
-      <div class="page-arrow">→</div>
-      <div class="page-name">Detalle de promesa + IA</div>
-      <div class="page-desc">Cadena de razonamiento completa, evidencias del BOE, historial de estados y panel de disputa pública.</div>
-      <div class="page-tags"><span class="tag">Razonamiento IA</span><span class="tag">BOE</span><span class="tag">Evidencias</span><span class="tag">Auditable</span></div>
-      <div class="status-row"><div class="status-dot"></div><span class="status-label">Construido</span></div>
-    </a>
-
-    <a href="democraticai-economia.html" class="page-card" style="--accent:#378ADD">
-      <div class="page-num">03 / Economía</div>
-      <div class="page-arrow">→</div>
-      <div class="page-name">Dashboard económico</div>
-      <div class="page-desc">Series históricas de deuda, PIB, paro e IPC desde el año 2000. Filtro de rango temporal y contexto europeo.</div>
-      <div class="page-tags"><span class="tag">INE</span><span class="tag">Series históricas</span><span class="tag">UE</span><span class="tag">Interactivo</span></div>
-      <div class="status-row"><div class="status-dot"></div><span class="status-label">Construido</span></div>
-    </a>
-
-    <a href="democraticai-partidos.html" class="page-card" style="--accent:#9C27B0">
-      <div class="page-num">04 / Partidos</div>
-      <div class="page-arrow">→</div>
-      <div class="page-name">Panel comparativo</div>
-      <div class="page-desc">5 partidos cara a cara. Composición del Congreso, cumplimiento por área temática y evolución mensual.</div>
-      <div class="page-tags"><span class="tag">PSOE</span><span class="tag">PP</span><span class="tag">VOX</span><span class="tag">Sumar</span><span class="tag">Cs</span></div>
-      <div class="status-row"><div class="status-dot"></div><span class="status-label">Construido</span></div>
-    </a>
-
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-label">🔴 En directo</div>
+  <div class="ticker-track" id="ticker">
+    <span>Deuda pública: 108.3% del PIB</span>
+    <span class="sep">·</span>
+    <span>Promesas analizadas esta semana: 12 nuevas</span>
+    <span class="sep">·</span>
+    <span>Última actualización BOE: hoy 08:34h</span>
+    <span class="sep">·</span>
+    <span>Tasa de paro: 11.2% (INE Q1 2026)</span>
+    <span class="sep">·</span>
+    <span>Presupuesto 2025 prorrogado: 563 días sin nuevos PGE</span>
+    <span class="sep">·</span>
+    <span>IPC interanual: +2.8%</span>
+    <span class="sep">·</span>
+    <span>Deuda pública: 108.3% del PIB</span>
+    <span class="sep">·</span>
+    <span>Promesas analizadas esta semana: 12 nuevas</span>
+    <span class="sep">·</span>
+    <span>Última actualización BOE: hoy 08:34h</span>
+    <span class="sep">·</span>
+    <span>Tasa de paro: 11.2% (INE Q1 2026)</span>
+    <span class="sep">·</span>
+    <span>Presupuesto 2025 prorrogado: 563 días sin nuevos PGE</span>
+    <span class="sep">·</span>
+    <span>IPC interanual: +2.8%</span>
+    <span class="sep">·</span>
   </div>
-
-  <div class="instructions">
-    <div class="inst-title">Cómo publicar esto en internet hoy mismo</div>
-    <div class="inst-steps">
-      <div class="inst-step">
-        <span class="inst-step-num">01</span>
-        Descarga todos los archivos HTML de esta conversación a una carpeta en tu ordenador.
-      </div>
-      <div class="inst-step">
-        <span class="inst-step-num">02</span>
-        Ve a <a href="https://app.netlify.com/drop" target="_blank">app.netlify.com/drop</a> y arrastra la carpeta entera. Sin registro. Sin comandos.
-      </div>
-      <div class="inst-step">
-        <span class="inst-step-num">03</span>
-        En 30 segundos tienes una URL pública tipo <span style="color:#c9a84c;font-family:monospace">tu-nombre.netlify.app</span> que puedes compartir con cualquiera.
-      </div>
-      <div class="inst-step">
-        <span class="inst-step-num">04</span>
-        Opcional: compra <span style="color:#c9a84c;font-family:monospace">democraticai.es</span> en Dondominio (~10€/año) y apúntalo a Netlify desde el panel de control.
-      </div>
-    </div>
-  </div>
-
-  <p class="footer-note">DemocraticAI · Prototipo de producto · Todos los datos son de demostración · 2026</p>
-
 </div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Democracia basada en datos</div>
+    <h1 class="hero-headline">
+      ¿Está el gobierno<br>
+      cumpliendo lo que<br>
+      <em>prometió?</em>
+    </h1>
+    <p class="hero-sub">
+      Monitorizamos cada promesa electoral, cada ley aprobada y cada euro gastado. 
+      Datos de fuentes oficiales, análisis auditable, sin agenda política.
+    </p>
+    <div class="hero-actions">
+      <a href="democraticai-registro.html" class="btn-primary">Recibir alertas gratis →</a>
+      <a href="democraticai-economia.html" class="btn-ghost">Ver datos económicos</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-value">847<span class="unit">prom.</span></div>
+        <div class="stat-label">Analizadas</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">34<span class="unit">%</span></div>
+        <div class="stat-label">Cumplidas</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">12.4<span class="unit">B€</span></div>
+        <div class="stat-label">Gasto rastreado</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="promise-board">
+      <div class="promise-board-header">
+        <span class="promise-board-title">Promesas recientes analizadas</span>
+        <span class="live-dot">En vivo</span>
+      </div>
+      <div class="promise-list">
+
+        <div class="promise-row">
+          <div>
+            <span class="status-pill cumplida">Cumplida</span>
+          </div>
+          <div style="flex:1">
+            <div class="promise-text">Subida del SMI al 60% del salario medio europeo</div>
+            <div class="promise-meta">PSOE · Programa electoral 2023 · BOE 2024/03847</div>
+          </div>
+          <div class="promise-confidence">
+            <div class="conf-label">Confianza</div>
+            <div class="conf-bar"><div class="conf-fill" style="width:89%"></div></div>
+            <div class="conf-label">89%</div>
+          </div>
+        </div>
+
+        <div class="promise-row">
+          <div>
+            <span class="status-pill proceso">En proceso</span>
+          </div>
+          <div style="flex:1">
+            <div class="promise-text">Ley de Vivienda con topes al alquiler en zonas tensionadas</div>
+            <div class="promise-meta">Coalición gov. · Acuerdo investidura 2023</div>
+          </div>
+          <div class="promise-confidence">
+            <div class="conf-label">Confianza</div>
+            <div class="conf-bar"><div class="conf-fill" style="width:72%"></div></div>
+            <div class="conf-label">72%</div>
+          </div>
+        </div>
+
+        <div class="promise-row">
+          <div>
+            <span class="status-pill incumplida">Incumplida</span>
+          </div>
+          <div style="flex:1">
+            <div class="promise-text">Reducción del déficit público al 3% antes de 2025</div>
+            <div class="promise-meta">PSOE · Programa 2023 · Déficit actual: 3.7%</div>
+          </div>
+          <div class="promise-confidence">
+            <div class="conf-label">Confianza</div>
+            <div class="conf-bar"><div class="conf-fill" style="width:94%"></div></div>
+            <div class="conf-label">94%</div>
+          </div>
+        </div>
+
+        <div class="promise-row">
+          <div>
+            <span class="status-pill parcial">Parcial</span>
+          </div>
+          <div style="flex:1">
+            <div class="promise-text">Transferencia de competencias en inmigración a Catalunya</div>
+            <div class="promise-meta">Acuerdo investidura · Pacto Junts 2023</div>
+          </div>
+          <div class="promise-confidence">
+            <div class="conf-label">Confianza</div>
+            <div class="conf-bar"><div class="conf-fill" style="width:61%"></div></div>
+            <div class="conf-label">61%</div>
+          </div>
+        </div>
+
+        <div class="promise-row">
+          <div>
+            <span class="status-pill proceso">En proceso</span>
+          </div>
+          <div style="flex:1">
+            <div class="promise-text">Ampliación de 6 a 8 semanas del permiso de nacimiento</div>
+            <div class="promise-meta">PSOE · Programa 2023 · En trámite parlamentario</div>
+          </div>
+          <div class="promise-confidence">
+            <div class="conf-label">Confianza</div>
+            <div class="conf-bar"><div class="conf-fill" style="width:78%"></div></div>
+            <div class="conf-label">78%</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DASHBOARD SECTION -->
+<section class="section" id="dashboard">
+  <div class="section-label">Dashboard en tiempo real</div>
+  <h2 class="section-headline">El estado del país,<br>en números</h2>
+  <p class="section-sub">Indicadores macroeconómicos y de cumplimiento actualizados diariamente desde fuentes oficiales. Sin interpretación editorial, solo datos.</p>
+
+  <!-- KPI Grid -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-tag">Deuda / PIB</div>
+      <div class="kpi-number red">108.3<span style="font-size:18px;color:var(--muted)">%</span></div>
+      <div class="kpi-change down">▲ +2.1pp vs 2023</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-tag">Tasa de paro</div>
+      <div class="kpi-number gold">11.2<span style="font-size:18px;color:var(--muted)">%</span></div>
+      <div class="kpi-change up">▼ -1.3pp vs 2023</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-tag">Promesas cumplidas</div>
+      <div class="kpi-number green">34<span style="font-size:18px;color:var(--muted)">%</span></div>
+      <div class="kpi-change" style="color:var(--muted)">de 847 analizadas</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-tag">IPC interanual</div>
+      <div class="kpi-number blue">2.8<span style="font-size:18px;color:var(--muted)">%</span></div>
+      <div class="kpi-change up">▼ -0.4pp vs feb</div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="chart-grid">
+    <div class="chart-panel">
+      <div class="chart-panel-header">
+        <span class="chart-panel-title">Evolución deuda pública (% PIB) · 2010–2026</span>
+        <a href="#" class="source-link">Fuente: INE</a>
+      </div>
+      <div class="chart-panel-body">
+        <div class="debt-chart-wrap">
+          <canvas id="debtChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-panel">
+      <div class="chart-panel-header">
+        <span class="chart-panel-title">Cumplimiento promesas</span>
+        <a href="#" class="source-link">847 total</a>
+      </div>
+      <div class="donut-wrap">
+        <canvas id="donutChart" class="donut-svg"></canvas>
+        <div class="donut-legend">
+          <div class="legend-row"><div class="legend-dot" style="background:#81c784"></div>Cumplidas<span class="legend-pct">34%</span></div>
+          <div class="legend-row"><div class="legend-dot" style="background:#64b5f6"></div>En proceso<span class="legend-pct">28%</span></div>
+          <div class="legend-row"><div class="legend-dot" style="background:#ffd54f"></div>Parciales<span class="legend-pct">16%</span></div>
+          <div class="legend-row"><div class="legend-dot" style="background:#e57373"></div>Incumplidas<span class="legend-pct">22%</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Promise Table -->
+  <div class="chart-panel" id="promesas">
+    <div class="chart-panel-header">
+      <span class="chart-panel-title">Promesas electorales — Legislatura actual (XIV)</span>
+      <a href="#" class="source-link">Ver todas →</a>
+    </div>
+    <div class="promise-table-wrap">
+      <table class="promise-table">
+        <thead>
+          <tr>
+            <th>Promesa</th>
+            <th>Partido</th>
+            <th>Estado</th>
+            <th>Confianza IA</th>
+            <th>Fuente</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Subida SMI al 60% del salario medio europeo</td>
+            <td><span class="party-badge">PSOE</span></td>
+            <td><span class="status-pill cumplida">Cumplida</span></td>
+            <td><span style="font-family:var(--mono);font-size:11px;color:#81c784">89%</span></td>
+            <td><a href="https://www.boe.es" class="source-link">BOE/2024/03847</a></td>
+          </tr>
+          <tr>
+            <td>Ley de Vivienda con regulación de alquileres</td>
+            <td><span class="party-badge">PSOE + Sumar</span></td>
+            <td><span class="status-pill proceso">En proceso</span></td>
+            <td><span style="font-family:var(--mono);font-size:11px;color:#64b5f6">72%</span></td>
+            <td><a href="https://www.boe.es" class="source-link">BOE/2023/12156</a></td>
+          </tr>
+          <tr>
+            <td>Reducción del déficit al 3% en 2025</td>
+            <td><span class="party-badge">PSOE</span></td>
+            <td><span class="status-pill incumplida">Incumplida</span></td>
+            <td><span style="font-family:var(--mono);font-size:11px;color:#e57373">94%</span></td>
+            <td><a href="https://www.ine.es" class="source-link">INE/CCNN/2025</a></td>
+          </tr>
+          <tr>
+            <td>Inversión en I+D hasta el 2% del PIB para 2027</td>
+            <td><span class="party-badge">PSOE</span></td>
+            <td><span class="status-pill parcial">Parcial</span></td>
+            <td><span style="font-family:var(--mono);font-size:11px;color:#ffd54f">68%</span></td>
+            <td><a href="https://www.pge.gob.es" class="source-link">PGE/2025/Cap.IX</a></td>
+          </tr>
+          <tr>
+            <td>Reforma del sistema de pensiones indexada al IPC</td>
+            <td><span class="party-badge">PSOE + Sumar</span></td>
+            <td><span class="status-pill cumplida">Cumplida</span></td>
+            <td><span style="font-family:var(--mono);font-size:11px;color:#81c784">91%</span></td>
+            <td><a href="https://www.boe.es" class="source-link">BOE/2023/28765</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="metodologia">
+  <div class="section-label">Metodología</div>
+  <h2 class="section-headline">Transparencia sobre<br>la transparencia</h2>
+  <p class="section-sub">Todo nuestro código es open source. Cada clasificación incluye su razonamiento completo. El algoritmo es auditable por cualquier ciudadano.</p>
+
+  <div class="how-grid">
+    <div class="how-card">
+      <div class="how-num">1</div>
+      <div class="how-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M2 4h12M2 8h8M2 12h10"/>
+        </svg>
+      </div>
+      <div class="how-title">Extracción de datos</div>
+      <div class="how-desc">
+        Ingestamos el BOE diariamente vía su API oficial, los indicadores del INE, los programas electorales de todos los partidos con representación parlamentaria y las memorias ministeriales.
+      </div>
+      <div class="how-tech">
+        <span class="tech-tag">BOE API</span>
+        <span class="tech-tag">INE API</span>
+        <span class="tech-tag">Apache Airflow</span>
+        <span class="tech-tag">Scrapy</span>
+      </div>
+    </div>
+
+    <div class="how-card">
+      <div class="how-num">2</div>
+      <div class="how-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="3"/><path d="M8 2v2M8 12v2M2 8h2M12 8h2"/>
+        </svg>
+      </div>
+      <div class="how-title">Análisis con IA</div>
+      <div class="how-desc">
+        Cada promesa electoral se vectoriza semánticamente y se compara contra el corpus legal. Un modelo de lenguaje evalúa la evidencia y clasifica el estado con una cadena de razonamiento explícita.
+      </div>
+      <div class="how-tech">
+        <span class="tech-tag">sentence-transformers</span>
+        <span class="tech-tag">pgvector</span>
+        <span class="tech-tag">LLM análisis</span>
+      </div>
+    </div>
+
+    <div class="how-card">
+      <div class="how-num">3</div>
+      <div class="how-icon">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M4 12L8 4l4 8M6 9h4"/>
+        </svg>
+      </div>
+      <div class="how-title">Auditoría humana</div>
+      <div class="how-desc">
+        Un Comité de Metodología formado por periodistas de datos, académicos y representantes de la sociedad civil revisa y valida cada actualización metodológica antes de publicarse.
+      </div>
+      <div class="how-tech">
+        <span class="tech-tag">Open source (AGPL)</span>
+        <span class="tech-tag">GitHub público</span>
+        <span class="tech-tag">Changelog auditable</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER SECTION -->
+<section style="padding:clamp(60px,7vw,90px) clamp(24px,5vw,80px);border-bottom:1px solid rgba(245,240,232,0.08);background:rgba(192,57,43,0.04);">
+  <div style="max-width:680px;margin:0 auto;text-align:center;">
+    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#c0392b;margin-bottom:14px;">Newsletter personalizado</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(26px,4vw,40px);font-weight:900;line-height:1.1;letter-spacing:-.02em;margin-bottom:14px;color:#f5f0e8;">Entérate cuando el gobierno<br>actúa sobre lo que te importa</h2>
+    <p style="font-size:14px;color:#6b6560;line-height:1.7;margin-bottom:28px;">Elige tus temas — Vivienda, Economía, Pensiones, Sanidad — y te avisamos cuando algo cambia. Sin spam. Sin publicidad. Gratis siempre.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:28px;">
+      <span style="font-family:'DM Mono',monospace;font-size:10px;padding:5px 12px;border-radius:3px;border:1px solid rgba(245,240,232,.12);color:rgba(245,240,232,.5)">🏠 Vivienda</span>
+      <span style="font-family:'DM Mono',monospace;font-size:10px;padding:5px 12px;border-radius:3px;border:1px solid rgba(245,240,232,.12);color:rgba(245,240,232,.5)">📊 Economía</span>
+      <span style="font-family:'DM Mono',monospace;font-size:10px;padding:5px 12px;border-radius:3px;border:1px solid rgba(245,240,232,.12);color:rgba(245,240,232,.5)">👴 Pensiones</span>
+      <span style="font-family:'DM Mono',monospace;font-size:10px;padding:5px 12px;border-radius:3px;border:1px solid rgba(245,240,232,.12);color:rgba(245,240,232,.5)">🏥 Sanidad</span>
+      <span style="font-family:'DM Mono',monospace;font-size:10px;padding:5px 12px;border-radius:3px;border:1px solid rgba(245,240,232,.12);color:rgba(245,240,232,.5)">💼 Empleo</span>
+      <span style="font-family:'DM Mono',monospace;font-size:10px;padding:5px 12px;border-radius:3px;border:1px solid rgba(245,240,232,.12);color:rgba(245,240,232,.5)">+ 5 más</span>
+    </div>
+    <a href="democraticai-registro.html" style="display:inline-block;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:#c0392b;color:#f5f0e8;border:none;padding:14px 32px;border-radius:3px;cursor:pointer;transition:all .2s;text-decoration:none;">Elegir mis temas →</a>
+    <p style="font-family:'DM Mono',monospace;font-size:10px;color:#6b6560;margin-top:12px;">Gratis · Sin tarjeta · Cancela cuando quieras</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-brand">
+    <div class="wordmark">Democratic<span>AI</span></div>
+    <p class="footer-desc">
+      Plataforma cívica independiente para la monitorización de la acción gubernamental en España. Sin financiación partidista. Sin agenda editorial.
+    </p>
+  </div>
+  <div>
+    <div class="footer-col-title">Plataforma</div>
+    <ul class="footer-links">
+      <li><a href="#dashboard">Dashboard principal</a></li>
+      <li><a href="democraticai-partidos.html">Comparativa partidos</a></li>
+      <li><a href="democraticai-economia.html">Indicadores económicos</a></li>
+      <li><a href="democraticai-registro.html">Newsletter personalizado</a></li>
+      <li><a href="democraticai-negocio.html">Modelo de negocio</a></li>
+    </ul>
+  </div>
+  <div>
+    <div class="footer-col-title">Proyecto</div>
+    <ul class="footer-links">
+      <li><a href="democraticai-transparencia.html">Metodología</a></li>
+      <li><a href="#">Código fuente (GitHub)</a></li>
+      <li><a href="#">Comité de metodología</a></li>
+      <li><a href="democraticai-negocio.html">Financiación</a></li>
+      <li><a href="democraticai-registro.html">Unirse al proyecto</a></li>
+    </ul>
+  </div>
+</footer>
+
+<div class="footer-bottom">
+  <p>© 2026 DemocraticAI · Datos de fuentes oficiales: BOE, INE, Ministerios · Actualizado diariamente</p>
+  <span class="open-source-badge">⬡ Open Source · AGPL-3.0</span>
+</div>
+
+<!-- CHARTS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+  // Debt Chart
+  const debtCtx = document.getElementById('debtChart').getContext('2d');
+  new Chart(debtCtx, {
+    type: 'line',
+    data: {
+      labels: ['2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2026'],
+      datasets: [{
+        label: 'Deuda % PIB',
+        data: [60.1, 70.5, 85.7, 95.8, 100.4, 99.3, 99.0, 98.3, 97.4, 95.5, 120.0, 118.4, 113.2, 107.7, 108.3, 108.3],
+        borderColor: '#c0392b',
+        backgroundColor: 'rgba(192,57,43,0.08)',
+        borderWidth: 2,
+        tension: 0.3,
+        fill: true,
+        pointRadius: 3,
+        pointBackgroundColor: '#c0392b',
+        pointBorderColor: '#0f0e0c',
+        pointBorderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(15,14,12,0.95)',
+          borderColor: 'rgba(245,240,232,0.1)',
+          borderWidth: 1,
+          titleColor: 'rgba(245,240,232,0.5)',
+          bodyColor: '#f5f0e8',
+          titleFont: { family: "'DM Mono', monospace", size: 10 },
+          bodyFont: { family: "'Playfair Display', serif", size: 16, weight: '700' },
+          callbacks: { label: (c) => ' ' + c.raw + '% del PIB' }
+        }
+      },
+      scales: {
+        y: {
+          min: 50,
+          max: 130,
+          grid: { color: 'rgba(245,240,232,0.05)' },
+          ticks: {
+            color: 'rgba(245,240,232,0.3)',
+            font: { family: "'DM Mono', monospace", size: 10 },
+            callback: (v) => v + '%'
+          },
+          border: { color: 'transparent' }
+        },
+        x: {
+          grid: { display: false },
+          ticks: {
+            color: 'rgba(245,240,232,0.3)',
+            font: { family: "'DM Mono', monospace", size: 9 },
+            maxRotation: 0,
+            autoSkip: true,
+            maxTicksLimit: 8
+          },
+          border: { color: 'rgba(245,240,232,0.08)' }
+        }
+      }
+    }
+  });
+
+  // Donut Chart
+  const donutCtx = document.getElementById('donutChart').getContext('2d');
+  new Chart(donutCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Cumplidas', 'En proceso', 'Parciales', 'Incumplidas'],
+      datasets: [{
+        data: [34, 28, 16, 22],
+        backgroundColor: ['#4a7f4c', '#2c5f8a', '#8a7420', '#8a2c2c'],
+        borderColor: ['#81c784', '#64b5f6', '#ffd54f', '#e57373'],
+        borderWidth: 1,
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: false,
+      cutout: '70%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(15,14,12,0.95)',
+          borderColor: 'rgba(245,240,232,0.1)',
+          borderWidth: 1,
+          titleColor: 'rgba(245,240,232,0.5)',
+          bodyColor: '#f5f0e8',
+          callbacks: { label: (c) => ' ' + c.label + ': ' + c.raw + '%' }
+        }
+      }
+    }
+  });
+</script>
+
 </body>
 </html>
