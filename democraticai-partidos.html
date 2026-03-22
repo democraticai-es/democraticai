@@ -30,14 +30,14 @@ body::before{content:'';position:fixed;inset:0;
   opacity:.35;pointer-events:none;z-index:0;}
 
 /* MASTHEAD */
-.masthead{border-bottom:1px solid var(--rule);padding:0 clamp(16px,3vw,52px);display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;background:rgba(15,14,12,0.95);backdrop-filter:blur(12px);}
+.masthead{border-bottom:1px solid var(--rule);padding:0 clamp(16px,3vw,52px);display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;background:rgba(15,14,12,0.97);backdrop-filter:blur(12px);}
 .masthead-left{display:flex;align-items:center;gap:16px;}
-.back-link{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color .2s;}
+.back-link{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,240,232,.7);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color .2s;}
 .back-link:hover{color:var(--paper);}
 .sep-v{width:1px;height:14px;background:var(--rule);}
-.bc{font-family:var(--mono);font-size:10px;color:var(--muted);}
+.bc{font-family:var(--mono);font-size:10px;color:rgba(245,240,232,.6);}
 .bc span{color:rgba(245,240,232,.4);}
-.wm{font-family:var(--serif);font-weight:700;font-size:16px;color:var(--paper);text-decoration:none;}
+.wm{font-family:var(--serif);font-weight:700;font-size:16px;color:#f5f0e8;text-decoration:none;}
 .wm em{color:var(--red);font-style:normal;}
 
 /* PAGE */
@@ -199,12 +199,12 @@ body::before{content:'';position:fixed;inset:0;
     <div class="bc">Dashboard <span>›</span> Partidos</div>
   </div>
   <nav style="display:flex;gap:20px;list-style:none;">
-      <a href="democraticai.html" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(245,240,232,.5);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f5f0e8'" onmouseout="this.style.color='rgba(245,240,232,.5)'">Inicio</a>
-      <a href="democraticai-partidos.html" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(245,240,232,.5);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f5f0e8'" onmouseout="this.style.color='rgba(245,240,232,.5)'">Partidos</a>
-      <a href="democraticai-economia.html" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(245,240,232,.5);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f5f0e8'" onmouseout="this.style.color='rgba(245,240,232,.5)'">Economía</a>
+      <a href="democraticai.html" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(245,240,232,.82);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f5f0e8'" onmouseout="this.style.color='rgba(245,240,232,.82)'">Inicio</a>
+      <a href="democraticai-partidos.html" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(245,240,232,.82);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f5f0e8'" onmouseout="this.style.color='rgba(245,240,232,.82)'">Partidos</a>
+      <a href="democraticai-economia.html" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(245,240,232,.82);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f5f0e8'" onmouseout="this.style.color='rgba(245,240,232,.82)'">Economía</a>
     </nav>
   <a href="democraticai.html" class="wm">Democratic<em>AI</em></a>
-  <div style="font-family:var(--mono);font-size:10px;color:var(--muted)">XIV Legislatura · 2023–</div>
+  <div style="font-family:var(--mono);font-size:10px;color:rgba(245,240,232,.65)">XIV Legislatura · 2023–</div>
 </header>
 
 <div class="page">
@@ -293,7 +293,7 @@ body::before{content:'';position:fixed;inset:0;
   <div class="h2h-section">
     <div class="h2h-header">
       <span class="h2h-title">Cara a cara — <strong id="h2hTitle">PSOE vs PP</strong></span>
-      <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">Partidos en gobierno vs primera oposición</span>
+      <span style="font-family:var(--mono);font-size:9px;color:rgba(245,240,232,.6)">Partidos en gobierno vs primera oposición</span>
     </div>
     <div class="h2h-grid" id="h2hGrid">
       <div class="h2h-row header-row">
@@ -311,7 +311,7 @@ body::before{content:'';position:fixed;inset:0;
   <div class="heatmap-section">
     <div class="h2h-header">
       <span class="h2h-title">Cumplimiento por área temática</span>
-      <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">% de promesas en cada estado por partido y área</span>
+      <span style="font-family:var(--mono);font-size:9px;color:rgba(245,240,232,.6)">% de promesas en cada estado por partido y área</span>
     </div>
     <div style="overflow-x:auto;">
       <table class="heatmap-table">
@@ -342,7 +342,7 @@ body::before{content:'';position:fixed;inset:0;
   <div class="timeline-section">
     <div class="h2h-header">
       <span class="h2h-title">Evolución del cumplimiento — <strong>Promesas cumplidas acumuladas</strong></span>
-      <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">Desde investidura (nov 2023)</span>
+      <span style="font-family:var(--mono);font-size:9px;color:rgba(245,240,232,.6)">Desde investidura (nov 2023)</span>
     </div>
     <div class="timeline-chart-wrap">
       <canvas id="evolutionChart"></canvas>
@@ -622,7 +622,7 @@ function buildEvolutionChart(){
       plugins:{
         legend:{display:false},
         tooltip:{
-          backgroundColor:'rgba(15,14,12,0.95)',
+          backgroundColor:'rgba(15,14,12,0.97)',
           borderColor:'rgba(245,240,232,0.1)',borderWidth:1,
           titleColor:'rgba(245,240,232,0.4)',titleFont:{family:"'DM Mono',monospace",size:10},
           bodyColor:'#f5f0e8',bodyFont:{family:"'DM Mono',monospace",size:11},
