@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Promesa #0847 — DemocraticAI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:#0f0e0c; --paper:#f5f0e8; --red:#c0392b; --red-bright:#e74c3c;
+    --gold:#c9a84c; --muted:#6b6560; --rule:rgba(245,240,232,0.08);
+    --mono:'DM Mono',monospace; --serif:'Playfair Display',Georgia,serif; --sans:'DM Sans',sans-serif;
+    --green-dim:rgba(76,175,80,0.12); --blue-dim:rgba(55,138,221,0.12);
+    --amber-dim:rgba(239,159,39,0.12); --rose-dim:rgba(192,57,43,0.12);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:var(--sans);background:var(--ink);color:var(--paper);overflow-x:hidden;font-size:15px;line-height:1.6;}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:.35;pointer-events:none;z-index:0;}
+
+  /* MASTHEAD */
+  .masthead{border-bottom:1px solid var(--rule);padding:0 clamp(20px,4vw,60px);display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:100;background:rgba(15,14,12,0.94);backdrop-filter:blur(12px);}
+  .masthead-left{display:flex;align-items:center;gap:20px;}
+  .back-link{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color .2s;}
+  .back-link:hover{color:var(--paper);}
+  .sep-v{width:1px;height:16px;background:var(--rule);}
+  .breadcrumb{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--muted);display:flex;align-items:center;gap:8px;}
+  .breadcrumb span{color:rgba(245,240,232,.5);}
+  .wordmark{font-family:var(--serif);font-weight:700;font-size:16px;color:var(--paper);text-decoration:none;}
+  .wordmark em{color:var(--red);font-style:normal;}
+
+  /* LAYOUT */
+  .page{max-width:1200px;margin:0 auto;padding:48px clamp(20px,4vw,60px) 80px;display:grid;grid-template-columns:1fr 320px;gap:40px;align-items:start;}
+  .side-col{position:sticky;top:74px;}
+
+  /* PROMISE HEADER */
+  .promise-header{margin-bottom:32px;}
+  .promise-meta-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px;}
+  .tag{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border-radius:2px;border:1px solid rgba(245,240,232,.12);color:rgba(245,240,232,.45);}
+  .tag.id-tag{color:var(--gold);border-color:rgba(201,168,76,.3);}
+  .status-badge{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:5px 12px;border-radius:3px;}
+  .status-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;}
+  .status-badge.incumplida{background:var(--rose-dim);color:#e57373;border:1px solid rgba(229,115,115,.3);}
+  .status-badge.cumplida{background:var(--green-dim);color:#81c784;border:1px solid rgba(129,199,132,.3);}
+  .status-badge.proceso{background:var(--blue-dim);color:#64b5f6;border:1px solid rgba(100,181,246,.3);}
+  .status-badge.parcial{background:var(--amber-dim);color:#ffd54f;border:1px solid rgba(255,213,79,.3);}
+  .promise-title{font-family:var(--serif);font-size:clamp(24px,3vw,38px);font-weight:700;line-height:1.15;color:var(--paper);margin-bottom:16px;letter-spacing:-.01em;}
+  .promise-origin{font-size:13px;color:rgba(245,240,232,.5);display:flex;flex-wrap:wrap;gap:16px;align-items:center;}
+  .promise-origin strong{color:rgba(245,240,232,.75);font-weight:500;}
+  .origin-sep{width:3px;height:3px;border-radius:50%;background:var(--muted);}
+
+  /* PANEL */
+  .panel{background:rgba(245,240,232,.03);border:1px solid var(--rule);border-radius:6px;overflow:hidden;margin-bottom:20px;}
+  .panel-header{padding:14px 20px;border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between;background:rgba(245,240,232,.02);}
+  .panel-title{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px;}
+  .panel-title svg{width:12px;height:12px;opacity:.6;}
+  .panel-body{padding:20px;}
+  .panel-action{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);text-decoration:none;opacity:.8;transition:opacity .2s;}
+  .panel-action:hover{opacity:1;}
+
+  /* CONFIDENCE */
+  .conf-block{display:flex;align-items:center;gap:14px;padding:18px 20px;border-bottom:1px solid var(--rule);}
+  .conf-circle{width:60px;height:60px;flex-shrink:0;position:relative;}
+  .conf-circle svg{width:100%;height:100%;transform:rotate(-90deg);}
+  .conf-circle-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:14px;font-weight:700;color:var(--paper);}
+  .conf-label{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+  .conf-desc{font-size:12px;color:rgba(245,240,232,.6);line-height:1.5;}
+
+  /* REASONING STEPS */
+  .reasoning-step{padding:18px 20px;border-bottom:1px solid rgba(245,240,232,.04);display:grid;grid-template-columns:28px 1fr;gap:14px;align-items:start;}
+  .reasoning-step:last-child{border-bottom:none;}
+  .step-num{width:28px;height:28px;border-radius:50%;background:rgba(245,240,232,.07);border:1px solid rgba(245,240,232,.12);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--muted);flex-shrink:0;}
+  .step-label{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+  .step-text{font-size:13px;line-height:1.65;color:rgba(245,240,232,.78);}
+  .step-text strong{color:var(--paper);font-weight:500;}
+  .step-text em{color:var(--gold);font-style:normal;font-family:var(--mono);font-size:11px;}
+
+  /* EVIDENCE */
+  .evidence-card{padding:16px 20px;border-bottom:1px solid rgba(245,240,232,.04);transition:background .15s;cursor:pointer;}
+  .evidence-card:last-child{border-bottom:none;}
+  .evidence-card:hover{background:rgba(245,240,232,.03);}
+  .evidence-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px;}
+  .evidence-ref{font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:var(--gold);text-decoration:none;}
+  .evidence-ref:hover{text-decoration:underline;}
+  .similarity-pill{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:2px;background:rgba(201,168,76,.1);color:var(--gold);border:1px solid rgba(201,168,76,.2);white-space:nowrap;flex-shrink:0;}
+  .evidence-title{font-size:13px;font-weight:500;color:rgba(245,240,232,.85);margin-bottom:6px;line-height:1.4;}
+  .evidence-excerpt{font-size:12px;color:rgba(245,240,232,.45);line-height:1.6;font-style:italic;border-left:2px solid rgba(245,240,232,.1);padding-left:10px;margin:8px 0;}
+  .evidence-meta{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:10px;color:var(--muted);}
+
+  /* TIMELINE */
+  .tl-item{display:grid;grid-template-columns:64px 20px 1fr;gap:0 14px;padding:12px 20px;align-items:start;}
+  .tl-date{font-family:var(--mono);font-size:10px;color:var(--muted);padding-top:3px;text-align:right;}
+  .tl-dot-col{display:flex;flex-direction:column;align-items:center;}
+  .tl-dot{width:10px;height:10px;border-radius:50%;border:2px solid;flex-shrink:0;margin-top:4px;}
+  .tl-dot.red{border-color:#e57373;background:rgba(229,115,115,.15);}
+  .tl-dot.green{border-color:#81c784;background:rgba(129,199,132,.15);}
+  .tl-dot.blue{border-color:#64b5f6;background:rgba(100,181,246,.15);}
+  .tl-dot.gold{border-color:var(--gold);background:rgba(201,168,76,.15);}
+  .tl-dot.gray{border-color:var(--muted);background:rgba(107,101,96,.15);}
+  .tl-line{width:1px;flex:1;background:rgba(245,240,232,.06);min-height:20px;margin-top:4px;}
+  .tl-event{font-size:13px;color:rgba(245,240,232,.8);margin-bottom:3px;line-height:1.4;}
+  .tl-event strong{color:var(--paper);font-weight:500;}
+  .tl-sub{font-family:var(--mono);font-size:10px;color:var(--muted);}
+
+  /* VERDICT */
+  .verdict-box{background:var(--rose-dim);border:1px solid rgba(229,115,115,.2);border-radius:6px;padding:20px;margin-bottom:20px;}
+  .verdict-label{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+  .verdict-text{font-family:var(--serif);font-size:17px;font-weight:700;line-height:1.35;color:var(--paper);margin-bottom:10px;}
+  .verdict-sub{font-size:12px;color:rgba(245,240,232,.55);line-height:1.6;}
+
+  /* SIDEBAR */
+  .meta-card{background:rgba(245,240,232,.03);border:1px solid var(--rule);border-radius:6px;overflow:hidden;margin-bottom:14px;}
+  .meta-card-header{padding:11px 16px;border-bottom:1px solid var(--rule);font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+  .meta-row{padding:10px 16px;border-bottom:1px solid rgba(245,240,232,.03);display:flex;flex-direction:column;gap:2px;}
+  .meta-row:last-child{border-bottom:none;}
+  .meta-k{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+  .meta-v{font-size:13px;color:rgba(245,240,232,.8);}
+  .meta-v a{color:var(--gold);text-decoration:none;font-family:var(--mono);font-size:11px;}
+  .meta-v a:hover{text-decoration:underline;}
+  .model-block{background:rgba(245,240,232,.02);border:1px solid var(--rule);border-radius:6px;padding:16px;margin-bottom:14px;}
+  .model-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .model-icon{width:30px;height:30px;border-radius:4px;background:rgba(192,57,43,.15);border:1px solid rgba(192,57,43,.3);display:flex;align-items:center;justify-content:center;}
+  .model-icon svg{width:14px;height:14px;color:var(--red);}
+  .model-name{font-family:var(--mono);font-size:11px;color:rgba(245,240,232,.7);}
+  .model-version{font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:1px;}
+  .model-params{display:flex;flex-direction:column;gap:8px;}
+  .param-row{display:flex;justify-content:space-between;align-items:center;}
+  .param-k{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.06em;}
+  .param-v{font-family:var(--mono);font-size:10px;color:rgba(245,240,232,.6);}
+  .action-btns{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+  .btn-side{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:10px 14px;border-radius:3px;cursor:pointer;transition:all .18s;text-align:center;text-decoration:none;display:block;border:1px solid;}
+  .btn-dispute{background:transparent;color:rgba(245,240,232,.6);border-color:rgba(245,240,232,.15);}
+  .btn-dispute:hover{border-color:rgba(245,240,232,.4);color:var(--paper);}
+  .btn-share{background:rgba(201,168,76,.1);color:var(--gold);border-color:rgba(201,168,76,.25);}
+  .btn-share:hover{background:rgba(201,168,76,.18);}
+  .btn-api{background:transparent;color:rgba(245,240,232,.4);border-color:rgba(245,240,232,.08);font-size:9px;}
+  .btn-api:hover{color:rgba(245,240,232,.7);border-color:rgba(245,240,232,.2);}
+  .dispute-note{background:rgba(239,159,39,.06);border:1px solid rgba(239,159,39,.15);border-radius:5px;padding:12px 14px;margin-bottom:14px;display:none;}
+  .dispute-note.visible{display:block;}
+  .dispute-note p{font-size:12px;color:rgba(245,240,232,.6);line-height:1.6;}
+  .dispute-note a{color:var(--gold);}
+  .related-item{padding:12px 20px;border-bottom:1px solid rgba(245,240,232,.04);display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .15s;text-decoration:none;}
+  .related-item:last-child{border-bottom:none;}
+  .related-item:hover{background:rgba(245,240,232,.03);}
+  .r-pill{font-family:var(--mono);font-size:8px;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:2px;}
+  .r-pill.cumplida{background:rgba(76,175,80,.12);color:#81c784;}
+  .r-pill.incumplida{background:rgba(229,115,115,.12);color:#e57373;}
+  .r-pill.parcial{background:rgba(255,213,79,.12);color:#ffd54f;}
+  .r-pill.proceso{background:rgba(100,181,246,.12);color:#64b5f6;}
+  .related-text{font-size:12px;color:rgba(245,240,232,.65);line-height:1.4;flex:1;}
+
+  /* PAGE FOOTER */
+  .page-footer{border-top:1px solid var(--rule);padding:20px clamp(20px,4vw,60px);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+  .page-footer p{font-family:var(--mono);font-size:10px;color:rgba(245,240,232,.2);letter-spacing:.05em;}
+  .open-badge{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:#81c784;border:1px solid rgba(129,199,132,.25);padding:3px 9px;border-radius:2px;}
+
+  /* ANIMATIONS */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+  .promise-header{animation:fadeUp .5s ease both;}
+  .verdict-box{animation:fadeUp .5s ease both .05s;}
+  .panel{animation:fadeUp .5s ease both .1s;}
+  .side-col{animation:fadeUp .5s ease both .15s;}
+  @keyframes fillArc{from{stroke-dashoffset:157;}to{stroke-dashoffset:9;}}
+  .conf-arc{animation:fillArc 1.2s ease .4s both;}
+
+  @media(max-width:860px){.page{grid-template-columns:1fr;}.side-col{position:static;}}
+</style>
+  <meta name="description" content="Cadena de razonamiento completa, evidencias del BOE y historial de estados para cada promesa electoral analizada.">
+  <meta property="og:title" content="Promesa analizada con IA — DemocraticAI">
+  <meta property="og:description" content="Cadena de razonamiento completa, evidencias del BOE y historial de estados para cada promesa electoral analizada.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="DemocraticAI">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Promesa analizada con IA — DemocraticAI">
+  <meta name="twitter:description" content="Cadena de razonamiento completa, evidencias del BOE y historial de estados para cada promesa electoral analizada.">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-left">
+    <a href="democraticai.html" class="back-link">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2L4 6l4 4"/></svg>
+      Volver
+    </a>
+    <div class="sep-v"></div>
+    <div class="breadcrumb">Promesas electorales <span>›</span> Economía <span>›</span> #0847</div>
+  </div>
+  <nav style="display:flex;gap:20px;list-style:none;">
+      <a href="democraticai.html" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(245,240,232,.5);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f5f0e8'" onmouseout="this.style.color='rgba(245,240,232,.5)'">Inicio</a>
+      <a href="democraticai-partidos.html" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(245,240,232,.5);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f5f0e8'" onmouseout="this.style.color='rgba(245,240,232,.5)'">Partidos</a>
+      <a href="democraticai-economia.html" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(245,240,232,.5);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f5f0e8'" onmouseout="this.style.color='rgba(245,240,232,.5)'">Economía</a>
+    </nav>
+  <a href="democraticai.html" class="wordmark">Democratic<em>AI</em></a>
+</header>
+
+<div class="page">
+
+  <!-- MAIN COLUMN -->
+  <main class="main-col">
+
+    <div class="promise-header">
+      <div class="promise-meta-row">
+        <span class="tag id-tag">Promesa #0847</span>
+        <span class="tag">Economía</span>
+        <span class="tag">Fiscalidad</span>
+        <span class="tag">XIV Legislatura</span>
+        <span class="status-badge incumplida">Incumplida</span>
+      </div>
+      <h1 class="promise-title">Reducción del déficit público<br>al 3% del PIB antes de 2025</h1>
+      <div class="promise-origin">
+        <span><strong>PSOE</strong> · Programa electoral 2023</span>
+        <div class="origin-sep"></div>
+        <span>Página 34, epígrafe "Estabilidad fiscal y responsabilidad"</span>
+        <div class="origin-sep"></div>
+        <span>Analizado el <strong>15 marzo 2026</strong></span>
+      </div>
+    </div>
+
+    <!-- VERDICT -->
+    <div class="verdict-box">
+      <div class="verdict-label">Veredicto del sistema</div>
+      <div class="verdict-text">El déficit público cerró 2024 en el 3.7% del PIB, por encima del objetivo comprometido del 3%. La evidencia documental disponible en el BOE y las cifras del INE no permiten clasificar esta promesa como cumplida.</div>
+      <div class="verdict-sub">Revisada por el Comité de Metodología el 2 de febrero de 2026 y ratificada sin modificaciones. Fuente primaria: INE, Contabilidad Nacional de España, avance Q4 2024.</div>
+    </div>
+
+    <!-- AI REASONING -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="4"/><path d="M6 4v2.5M6 8v.5"/></svg>
+          Cadena de razonamiento del sistema IA
+        </span>
+        <a href="#" class="panel-action">Ver JSON completo →</a>
+      </div>
+
+      <div class="conf-block">
+        <div class="conf-circle">
+          <svg viewBox="0 0 60 60">
+            <circle cx="30" cy="30" r="25" fill="none" stroke="rgba(245,240,232,0.07)" stroke-width="4"/>
+            <circle cx="30" cy="30" r="25" fill="none" stroke="#e57373" stroke-width="4"
+              stroke-dasharray="157" stroke-dashoffset="9" stroke-linecap="round" class="conf-arc"/>
+          </svg>
+          <div class="conf-circle-val">94%</div>
+        </div>
+        <div>
+          <div class="conf-label">Confianza en la clasificación</div>
+          <div class="conf-desc">Nivel muy alto. La evidencia cuantitativa es directa y procede de fuentes primarias del INE. No existen contraargumentos documentales que reduzcan la certeza.</div>
+        </div>
+      </div>
+
+      <div class="reasoning-step">
+        <div class="step-num">1</div>
+        <div>
+          <div class="step-label">Extracción y vectorización de la promesa</div>
+          <div class="step-text">El texto original <strong>"reducir el déficit al 3% del PIB antes de 2025"</strong> fue segmentado como promesa unitaria, etiquetado con las categorías <em>economía</em>, <em>fiscalidad</em>, <em>déficit</em> y vectorizado con el modelo <em>paraphrase-multilingual-mpnet-base-v2</em>. Vector de 768 dimensiones almacenado en pgvector con ID <em>vec_847_v3</em>.</div>
+        </div>
+      </div>
+
+      <div class="reasoning-step">
+        <div class="step-num">2</div>
+        <div>
+          <div class="step-label">Búsqueda semántica en corpus legal y estadístico</div>
+          <div class="step-text">Búsqueda por similitud coseno (umbral ≥ 0.72) sobre el corpus de <strong>184.320 documentos</strong> indexados del BOE (2023–2026) y series del INE. Recuperados <strong>23 documentos candidatos</strong>. Los 7 más relevantes seleccionados para análisis de evidencia. Similitud media del top-7: <em>0.831</em>.</div>
+        </div>
+      </div>
+
+      <div class="reasoning-step">
+        <div class="step-num">3</div>
+        <div>
+          <div class="step-label">Análisis de evidencia</div>
+          <div class="step-text">El sistema evaluó cada documento candidato. <strong>Evidencia determinante:</strong> Las Cuentas Nacionales del INE (publicación provisional, 28 enero 2026) cifran el déficit de las AAPP en el <em>3.7% del PIB</em> para 2024. Este dato cuantitativo —directamente medible contra el objetivo del 3%— es suficiente para la clasificación. No se encontraron documentos en el BOE que redefinan el indicador o amplíen el plazo.</div>
+        </div>
+      </div>
+
+      <div class="reasoning-step">
+        <div class="step-num">4</div>
+        <div>
+          <div class="step-label">Evaluación de matices y contexto</div>
+          <div class="step-text">El sistema consideró: (a) Si "antes de 2025" podría interpretarse como cierre de 2025 — <strong>descartado</strong>: la redacción literal establece "antes de 2025". (b) Si el contexto macroeconómico justifica incumplimiento como fuerza mayor — <strong>no aplicable</strong>: el sistema constata el resultado frente al compromiso, sin evaluar justificaciones. La clasificación no implica juicio sobre la gestión, solo verificación del resultado.</div>
+        </div>
+      </div>
+
+      <div class="reasoning-step">
+        <div class="step-num">5</div>
+        <div>
+          <div class="step-label">Clasificación final</div>
+          <div class="step-text">Con base en la evidencia anterior, el sistema clasifica como <em>INCUMPLIDA</em> con confianza <em>0.94</em>. La evidencia cuantitativa directa (déficit 3.7% vs objetivo 3%) no deja margen para "Parcialmente cumplida" o "En proceso": el plazo ha vencido y el dato final está disponible. Clasificación sometida a revisión del Comité de Metodología antes de su publicación.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EVIDENCE -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="1" width="8" height="10" rx="1"/><path d="M4 4h4M4 7h2"/></svg>
+          Documentos de evidencia (7 recuperados)
+        </span>
+        <a href="#" class="panel-action">Descargar corpus →</a>
+      </div>
+
+      <div class="evidence-card">
+        <div class="evidence-top">
+          <a href="https://www.ine.es" class="evidence-ref">INE · Contabilidad Nacional de España · Avance Q4 2024</a>
+          <span class="similarity-pill">Similitud: 0.94</span>
+        </div>
+        <div class="evidence-title">Déficit de las Administraciones Públicas, 2024. Avance provisional.</div>
+        <div class="evidence-excerpt">"El déficit del conjunto de las Administraciones Públicas en términos de Protocolo de Déficit Excesivo (PDE) se situó en el 3,7% del PIB en 2024, frente al 3,7% del año anterior."</div>
+        <div class="evidence-meta"><span>Publicado: 28 ene 2026</span><span>Tipo: Dato estadístico primario</span><span>Peso: Determinante</span></div>
+      </div>
+
+      <div class="evidence-card">
+        <div class="evidence-top">
+          <a href="https://www.boe.es" class="evidence-ref">BOE · A-2024-4821 · Ley de Presupuestos Generales del Estado</a>
+          <span class="similarity-pill">Similitud: 0.87</span>
+        </div>
+        <div class="evidence-title">Ley 31/2023, de 28 de diciembre, de PGE para el año 2024 — Prorrogados.</div>
+        <div class="evidence-excerpt">"El objetivo de déficit para el conjunto de las Administraciones Públicas se fija en el 3,0% del PIB para el ejercicio 2024, en línea con los compromisos de estabilidad presupuestaria…"</div>
+        <div class="evidence-meta"><span>Publicado: 29 dic 2023</span><span>Tipo: Norma con rango de ley</span><span>Peso: Contexto del compromiso</span></div>
+      </div>
+
+      <div class="evidence-card">
+        <div class="evidence-top">
+          <a href="https://www.minhap.gob.es" class="evidence-ref">MINHAP · Informe de Ejecución Presupuestaria · Sep 2024</a>
+          <span class="similarity-pill">Similitud: 0.82</span>
+        </div>
+        <div class="evidence-title">Ejecución del Presupuesto de las AAPP. Acumulado enero–septiembre 2024.</div>
+        <div class="evidence-excerpt">"El déficit acumulado a septiembre 2024 asciende al 2,4% del PIB en términos PDE, requiriendo una corrección en el último trimestre que los modelos de previsión sitúan como insuficiente para alcanzar el objetivo anual del 3%."</div>
+        <div class="evidence-meta"><span>Publicado: 31 oct 2024</span><span>Tipo: Informe ministerial</span><span>Peso: Indicador de tendencia</span></div>
+      </div>
+
+      <div class="evidence-card" style="opacity:.5">
+        <div class="evidence-top">
+          <span class="evidence-ref" style="color:var(--muted)">+ 4 documentos adicionales de menor relevancia</span>
+          <span class="similarity-pill" style="opacity:.5">0.72 – 0.79</span>
+        </div>
+        <div class="evidence-title" style="color:rgba(245,240,232,.4)">Informes de ejecución mensual, comunicaciones de la Comisión Europea y documentación del Consejo de Política Fiscal</div>
+        <div class="evidence-meta"><span>Peso: Contextual / no determinante</span><a href="#" style="color:var(--gold);font-family:var(--mono);font-size:10px;text-decoration:none">Expandir →</a></div>
+      </div>
+    </div>
+
+    <!-- ORIGINAL TEXT -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h8M2 6h6M2 9h4"/></svg>
+          Texto original de la promesa
+        </span>
+        <a href="#" class="panel-action">Abrir programa electoral →</a>
+      </div>
+      <div class="panel-body">
+        <p style="font-family:var(--mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:14px">PSOE · Programa electoral 23J 2023 · Pág. 34 · Epígrafe 3.2: Estabilidad fiscal y responsabilidad</p>
+        <blockquote style="border-left:2px solid var(--red);padding-left:16px;margin-bottom:14px">
+          <p style="font-family:var(--serif);font-style:italic;font-size:17px;line-height:1.6;color:rgba(245,240,232,.85)">"Nos comprometemos a reducir el déficit público al 3% del PIB antes de 2025, consolidando la senda de estabilidad fiscal iniciada en la presente legislatura y en consonancia con los objetivos de estabilidad acordados con nuestros socios europeos."</p>
+        </blockquote>
+        <p style="font-size:12px;color:var(--muted);line-height:1.6">Texto extraído mediante OCR + validación manual del PDF oficial depositado ante la Junta Electoral Central. Hash SHA-256 del documento: <span style="font-family:var(--mono);font-size:10px;color:rgba(245,240,232,.3)">a3f8c1d2e9b047f3...</span></p>
+      </div>
+    </div>
+
+    <!-- TIMELINE -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="1"/><path d="M6 2v1M6 9v1M2 6h1M9 6h1"/></svg>
+          Historial de esta promesa
+        </span>
+      </div>
+      <div style="padding:8px 0">
+        <div class="tl-item">
+          <div class="tl-date">Jul 2023</div>
+          <div class="tl-dot-col"><div class="tl-dot gray"></div><div class="tl-line"></div></div>
+          <div><div class="tl-event"><strong>Promesa registrada.</strong> Programa electoral PSOE 23J publicado. Extraída y catalogada automáticamente.</div><div class="tl-sub">Estado: Sin verificar</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">Nov 2023</div>
+          <div class="tl-dot-col"><div class="tl-dot blue"></div><div class="tl-line"></div></div>
+          <div><div class="tl-event">Investidura. El objetivo del 3% se reitera en el Acuerdo de Coalición PSOE–Sumar y en el Programa de Estabilidad 2024–2027.</div><div class="tl-sub">Estado: En proceso · Confianza: 72%</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">Oct 2024</div>
+          <div class="tl-dot-col"><div class="tl-dot gold"></div><div class="tl-line"></div></div>
+          <div><div class="tl-event">Informe de ejecución presupuestaria septiembre 2024 proyecta déficit final superior al 3%. El sistema actualiza clasificación preventiva.</div><div class="tl-sub">Estado: En riesgo · Confianza: 81%</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">Ene 2026</div>
+          <div class="tl-dot-col"><div class="tl-dot red"></div><div class="tl-line"></div></div>
+          <div><div class="tl-event">INE publica dato provisional del déficit 2024: <strong>3.7% del PIB</strong>. El sistema clasifica automáticamente como Incumplida.</div><div class="tl-sub">Estado: Incumplida (provisional) · Confianza: 94%</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">Feb 2026</div>
+          <div class="tl-dot-col"><div class="tl-dot red"></div></div>
+          <div><div class="tl-event">Comité de Metodología ratifica la clasificación. Revisada por 3 miembros. Publicada en plataforma.</div><div class="tl-sub">Estado final: Incumplida · Confianza: 94%</div></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- SIDE COLUMN -->
+  <aside class="side-col">
+
+    <div class="action-btns">
+      <a href="#" class="btn-side btn-share"
+        onclick="navigator.clipboard&&navigator.clipboard.writeText(location.href);this.textContent='¡Enlace copiado!';setTimeout(()=>this.textContent='Compartir esta promesa',2000);return false">
+        Compartir esta promesa
+      </a>
+      <a href="#" class="btn-side btn-dispute"
+        onclick="document.getElementById('dispute').classList.toggle('visible');return false">
+        Disputar esta clasificación
+      </a>
+      <a href="#" class="btn-side btn-api">GET /api/v1/promises/847</a>
+    </div>
+
+    <div class="dispute-note" id="dispute">
+      <p>Si crees que esta clasificación es incorrecta, abre un issue en nuestro <a href="#">repositorio público de GitHub</a>. Cada disputa es revisada por el Comité de Metodología en un plazo máximo de 15 días hábiles.</p>
+    </div>
+
+    <div class="meta-card">
+      <div class="meta-card-header">Metadatos de la promesa</div>
+      <div class="meta-row"><div class="meta-k">ID</div><div class="meta-v">#0847</div></div>
+      <div class="meta-row"><div class="meta-k">Partido</div><div class="meta-v">PSOE</div></div>
+      <div class="meta-row"><div class="meta-k">Legislatura</div><div class="meta-v">XIV (2023–)</div></div>
+      <div class="meta-row"><div class="meta-k">Categoría</div><div class="meta-v">Economía · Fiscalidad</div></div>
+      <div class="meta-row"><div class="meta-k">Fuente original</div><div class="meta-v"><a href="#">Programa PSOE 23J, pág. 34 ↗</a></div></div>
+      <div class="meta-row"><div class="meta-k">Última actualización</div><div class="meta-v">15 mar 2026</div></div>
+      <div class="meta-row"><div class="meta-k">Revisión humana</div><div class="meta-v">Sí · 2 feb 2026 · 3 revisores</div></div>
+    </div>
+
+    <div class="model-block">
+      <div class="model-header">
+        <div class="model-icon">
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="7" cy="7" r="5"/><path d="M7 4v3l2 2"/></svg>
+        </div>
+        <div>
+          <div class="model-name">Motor de análisis IA</div>
+          <div class="model-version">democraticai-classifier · v2.1.4</div>
+        </div>
+      </div>
+      <div class="model-params">
+        <div class="param-row"><span class="param-k">Embedding</span><span class="param-v">mpnet-base-v2</span></div>
+        <div class="param-row"><span class="param-k">Umbral similitud</span><span class="param-v">≥ 0.72</span></div>
+        <div class="param-row"><span class="param-k">Docs. evaluados</span><span class="param-v">23</span></div>
+        <div class="param-row"><span class="param-k">Top-K evidencias</span><span class="param-v">7</span></div>
+        <div class="param-row"><span class="param-k">Temperatura LLM</span><span class="param-v">0.10</span></div>
+        <div class="param-row"><span class="param-k">Código fuente</span><span class="param-v"><a href="#" style="color:var(--gold);text-decoration:none;font-size:10px">GitHub ↗</a></span></div>
+      </div>
+    </div>
+
+    <div class="meta-card">
+      <div class="meta-card-header">Promesas relacionadas</div>
+      <a href="#" class="related-item">
+        <span class="r-pill proceso">Proceso</span>
+        <div class="related-text">Reducción del gasto corriente en el 2% anual</div>
+      </a>
+      <a href="#" class="related-item">
+        <span class="r-pill incumplida">Incumplida</span>
+        <div class="related-text">No subir impuestos a las rentas inferiores a 60.000€</div>
+      </a>
+      <a href="#" class="related-item">
+        <span class="r-pill cumplida">Cumplida</span>
+        <div class="related-text">Reforma pensiones con indexación al IPC</div>
+      </a>
+      <a href="#" class="related-item">
+        <span class="r-pill parcial">Parcial</span>
+        <div class="related-text">Inversión en I+D hasta el 2% del PIB para 2027</div>
+      </a>
+    </div>
+
+  </aside>
+</div>
+
+<section style="background:rgba(192,57,43,0.05);border-top:1px solid rgba(245,240,232,0.08);padding:32px clamp(16px,3vw,52px);display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
+  <div>
+    <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#c0392b;margin-bottom:6px;">Newsletter inteligente</div>
+    <p style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#f5f0e8;margin-bottom:0;">Entérate cuando el gobierno actúa sobre lo que te importa.</p>
+  </div>
+  <a href="democraticai-registro.html" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:#c0392b;color:#f5f0e8;padding:12px 24px;border-radius:3px;text-decoration:none;white-space:nowrap;flex-shrink:0;">Elegir mis temas →</a>
+</section>
+<footer class="page-footer">
+  <p>DemocraticAI · Datos de fuentes oficiales: BOE, INE, Ministerios · Código abierto (AGPL-3.0) · Sin financiación partidista</p>
+  <span class="open-badge">⬡ Open Source</span>
+</footer>
+
+</body>
+</html>

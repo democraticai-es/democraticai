@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suscribirse — DemocraticAI</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0f0e0c;--paper:#f5f0e8;--red:#c0392b;--red-b:#e74c3c;--gold:#c9a84c;--muted:#6b6560;--rule:rgba(245,240,232,0.08);--mono:'DM Mono',monospace;--serif:'Playfair Display',Georgia,serif;--sans:'DM Sans',sans-serif;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--sans);background:var(--ink);color:var(--paper);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:.35;pointer-events:none;z-index:0;}
+.mh{border-bottom:1px solid var(--rule);padding:0 clamp(16px,3vw,52px);display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;background:rgba(15,14,12,0.95);backdrop-filter:blur(12px);}
+.bl{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color .2s;}
+.bl:hover{color:var(--paper);}
+.wm{font-family:var(--serif);font-weight:700;font-size:16px;color:var(--paper);text-decoration:none;}
+.wm em{color:var(--red);font-style:normal;}
+.pg{max-width:1080px;margin:0 auto;padding:0 clamp(16px,3vw,52px) 80px;}
+.rh{padding:52px 0 44px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;border-bottom:1px solid var(--rule);margin-bottom:44px;}
+.ey{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.ey::before{content:'';width:20px;height:1px;background:var(--red);}
+.ht{font-family:var(--serif);font-size:clamp(28px,4vw,46px);font-weight:900;line-height:1.08;letter-spacing:-.02em;margin-bottom:16px;}
+.ht em{font-style:italic;color:rgba(245,240,232,.4);}
+.hs{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:24px;max-width:400px;}
+.pi{display:flex;flex-direction:column;gap:8px;}
+.pii{display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(245,240,232,.6);}
+.pii::before{content:'✓';color:var(--red);font-size:12px;flex-shrink:0;}
+.sp{margin-top:28px;padding-top:20px;border-top:1px solid var(--rule);}
+.spl{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.sps{display:flex;gap:24px;}
+.spn{font-family:var(--serif);font-size:22px;font-weight:700;color:var(--paper);line-height:1;}
+.spd{font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px;}
+.fp{background:rgba(245,240,232,.03);border:1px solid var(--rule);border-radius:8px;overflow:hidden;}
+.fph{padding:16px 22px;border-bottom:1px solid var(--rule);font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.fpb{padding:26px 22px;}
+.pw{height:2px;background:rgba(245,240,232,.06);margin-bottom:22px;border-radius:1px;overflow:hidden;}
+.pf{height:100%;background:var(--red);border-radius:1px;transition:width .4s ease;}
+.si{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.sd{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:500;flex-shrink:0;transition:all .3s;}
+.sd.act{background:var(--red);color:var(--paper);}
+.sd.dn{background:rgba(76,175,80,.15);color:#81c784;border:1px solid rgba(76,175,80,.3);}
+.sd.pn{background:transparent;color:var(--muted);border:1px solid rgba(245,240,232,.12);}
+.sl{flex:1;height:1px;background:rgba(245,240,232,.08);}
+.sp2{display:none;}
+.sp2.act{display:block;}
+.tg{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:20px;}
+.tc{border:1px solid rgba(245,240,232,.1);border-radius:5px;padding:12px 13px;cursor:pointer;transition:all .2s;position:relative;user-select:none;}
+.tc:hover{border-color:rgba(245,240,232,.25);background:rgba(245,240,232,.03);}
+.tc.sel{border-color:var(--red);background:rgba(192,57,43,.08);}
+.tc input{position:absolute;opacity:0;width:0;height:0;}
+.tck{position:absolute;top:9px;right:9px;width:15px;height:15px;border-radius:3px;border:1px solid rgba(245,240,232,.2);display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.tc.sel .tck{background:var(--red);border-color:var(--red);}
+.tck svg{width:8px;height:8px;color:var(--paper);opacity:0;}
+.tc.sel .tck svg{opacity:1;}
+.ti{font-size:16px;margin-bottom:4px;}
+.tn{font-size:12px;font-weight:500;color:rgba(245,240,232,.85);margin-bottom:2px;}
+.td{font-size:10px;color:var(--muted);}
+.tc2{font-family:var(--mono);font-size:9px;color:rgba(245,240,232,.3);margin-top:4px;}
+.fo{display:flex;flex-direction:column;gap:7px;margin-bottom:20px;}
+.fop{border:1px solid rgba(245,240,232,.1);border-radius:5px;padding:12px 14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:12px;user-select:none;}
+.fop:hover{border-color:rgba(245,240,232,.25);}
+.fop.sel{border-color:var(--red);background:rgba(192,57,43,.06);}
+.fop input{display:none;}
+.fr{width:15px;height:15px;border-radius:50%;border:1.5px solid rgba(245,240,232,.2);flex-shrink:0;position:relative;transition:all .2s;}
+.fop.sel .fr{border-color:var(--red);}
+.fop.sel .fr::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--red);}
+.fn{font-size:13px;color:rgba(245,240,232,.85);font-weight:500;margin-bottom:1px;}
+.fdesc{font-size:11px;color:var(--muted);}
+.fb{font-family:var(--mono);font-size:8px;padding:2px 6px;border-radius:2px;background:rgba(201,168,76,.1);color:var(--gold);border:1px solid rgba(201,168,76,.2);margin-left:auto;flex-shrink:0;}
+.fl{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;display:block;}
+.fi{width:100%;background:rgba(245,240,232,.05);border:1px solid rgba(245,240,232,.12);border-radius:4px;padding:11px 13px;font-family:var(--sans);font-size:14px;color:var(--paper);outline:none;transition:border-color .2s;margin-bottom:12px;}
+.fi::placeholder{color:rgba(245,240,232,.22);}
+.fi:focus{border-color:rgba(245,240,232,.35);}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.plg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:20px;}
+.plc{border:1px solid rgba(245,240,232,.1);border-radius:5px;padding:14px;cursor:pointer;transition:all .2s;position:relative;user-select:none;}
+.plc:hover{border-color:rgba(245,240,232,.22);}
+.plc.sel{border-color:var(--gold);background:rgba(201,168,76,.06);}
+.plc.feat{border-color:rgba(201,168,76,.28);}
+.pp{font-family:var(--mono);font-size:8px;letter-spacing:.06em;background:var(--gold);color:var(--ink);padding:2px 7px;border-radius:2px;display:inline-block;margin-bottom:7px;}
+.pln{font-size:13px;font-weight:500;color:var(--paper);margin-bottom:3px;}
+.plp{font-family:var(--serif);font-size:24px;font-weight:700;color:var(--paper);margin-bottom:1px;line-height:1;}
+.plper{font-family:var(--mono);font-size:9px;color:var(--muted);}
+.plfs{margin-top:9px;display:flex;flex-direction:column;gap:3px;}
+.plf{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:5px;}
+.plf::before{content:'✓';color:#81c784;font-size:9px;flex-shrink:0;}
+.plck{position:absolute;top:9px;right:9px;width:13px;height:13px;border-radius:50%;border:1px solid rgba(245,240,232,.12);}
+.plc.sel .plck{background:var(--gold);border-color:var(--gold);}
+.bp{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:var(--red);color:var(--paper);border:none;padding:13px 24px;border-radius:3px;cursor:pointer;transition:all .2s;width:100%;margin-top:4px;}
+.bp:hover{background:var(--red-b);}
+.bp:disabled{opacity:.4;cursor:not-allowed;}
+.bg{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:transparent;color:rgba(245,240,232,.45);border:1px solid rgba(245,240,232,.12);padding:9px 20px;border-radius:3px;cursor:pointer;transition:all .2s;margin-top:7px;width:100%;}
+.bg:hover{color:var(--paper);border-color:rgba(245,240,232,.3);}
+.fne{font-family:var(--mono);font-size:9px;color:var(--muted);text-align:center;margin-top:9px;line-height:1.6;}
+.fne a{color:var(--gold);text-decoration:none;}
+.suc{text-align:center;padding:28px 20px;display:none;}
+.si2{width:52px;height:52px;border-radius:50%;background:rgba(76,175,80,.12);border:1px solid rgba(76,175,80,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;}
+.st2{font-family:var(--serif);font-size:22px;font-weight:700;color:var(--paper);margin-bottom:8px;}
+.ss2{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px;}
+.stl{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-bottom:20px;}
+.stg{font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:2px;background:rgba(192,57,43,.1);color:#ef9a9a;border:1px solid rgba(192,57,43,.18);}
+.bn{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:40px 0;border-top:1px solid var(--rule);}
+.bc2{background:rgba(245,240,232,.02);border:1px solid var(--rule);border-radius:6px;padding:18px;}
+.bi{width:30px;height:30px;border-radius:4px;background:rgba(192,57,43,.1);border:1px solid rgba(192,57,43,.22);display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+.bi svg{width:14px;height:14px;color:var(--red);}
+.btt{font-size:13px;font-weight:500;color:var(--paper);margin-bottom:5px;}
+.bds{font-size:12px;color:var(--muted);line-height:1.5;}
+@keyframes fu{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.rh{animation:fu .5s ease both;}
+.bn{animation:fu .5s ease both .1s;}
+@media(max-width:820px){.rh{grid-template-columns:1fr;gap:28px;}.tg{grid-template-columns:1fr;}.plg{grid-template-columns:1fr;}.bn{grid-template-columns:1fr;}}
+@media(max-width:460px){.fr2{grid-template-columns:1fr;}}
+</style>
+  <meta name="description" content="Elige tus temas y recibe alertas cuando el gobierno actúa. Gratis, sin spam, sin publicidad.">
+  <meta property="og:title" content="Recibe alertas sobre lo que te importa — DemocraticAI">
+  <meta property="og:description" content="Elige tus temas y recibe alertas cuando el gobierno actúa. Gratis, sin spam, sin publicidad.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="DemocraticAI">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Recibe alertas sobre lo que te importa — DemocraticAI">
+  <meta name="twitter:description" content="Elige tus temas y recibe alertas cuando el gobierno actúa. Gratis, sin spam, sin publicidad.">
+</head>
+<body>
+<header class="mh">
+  <a href="democraticai.html" class="bl"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2L4 6l4 4"/></svg>Inicio</a>
+  <a href="democraticai.html" class="wm">Democratic<em>AI</em></a>
+  <nav style="display:flex;gap:20px;list-style:none;">
+      <a href="democraticai.html" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(245,240,232,.5);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f5f0e8'" onmouseout="this.style.color='rgba(245,240,232,.5)'">Inicio</a>
+      <a href="democraticai-partidos.html" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(245,240,232,.5);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f5f0e8'" onmouseout="this.style.color='rgba(245,240,232,.5)'">Partidos</a>
+      <a href="democraticai-economia.html" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(245,240,232,.5);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f5f0e8'" onmouseout="this.style.color='rgba(245,240,232,.5)'">Economía</a>
+    </nav>
+  <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">Gratis · Sin spam</span>
+</header>
+
+<div class="pg">
+<div class="rh">
+  <div>
+    <div class="ey">Newsletter inteligente</div>
+    <h1 class="ht">Entérate cuando<br>el gobierno actúa<br><em>sobre lo que importa.</em></h1>
+    <p class="hs">Elige tus temas — Vivienda, Pensiones, Economía — y te avisamos cuando se aprueba una ley, cambia una promesa o el INE publica un dato clave. Sin ruido, sin interpretación.</p>
+    <div class="pi">
+      <div class="pii">Solo los temas que hayas elegido. Sin ruido ni spam.</div>
+      <div class="pii">Cada dato lleva su fuente oficial (BOE, INE). Siempre.</div>
+      <div class="pii">Sin publicidad. Sin venta de datos. Garantizado.</div>
+      <div class="pii">Cancela con un clic. Sin formularios ni preguntas.</div>
+    </div>
+    <div class="sp">
+      <div class="spl">En el proyecto ahora mismo</div>
+      <div class="sps">
+        <div><div class="spn">847</div><div class="spd">promesas rastreadas</div></div>
+        <div><div class="spn">10</div><div class="spd">áreas temáticas</div></div>
+        <div><div class="spn">Diaria</div><div class="spd">actualización BOE/INE</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fp" id="formPanel">
+    <div class="fph" id="formHeader">Configura tu alerta — 3 pasos</div>
+    <div class="fpb">
+      <div class="pw"><div class="pf" id="pf" style="width:33%"></div></div>
+      <div class="si" style="margin-bottom:18px;">
+        <div class="sd act" id="sd1">1</div><div class="sl"></div>
+        <div class="sd pn" id="sd2">2</div><div class="sl"></div>
+        <div class="sd pn" id="sd3">3</div>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="sp2 act" id="s1">
+        <div style="font-size:13px;color:rgba(245,240,232,.7);margin-bottom:13px;">¿Qué temas te interesan? <span style="font-size:10px;color:var(--muted)">(elige al menos uno)</span></div>
+        <div class="tg">
+          <label class="tc" onclick="tog(this,'vivienda')"><input type="checkbox"><div class="tck"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><path d="M1.5 5l2.5 2.5 4.5-4"/></svg></div><div class="ti">🏠</div><div class="tn">Vivienda</div><div class="td">Alquiler, hipotecas, VPO</div><div class="tc2">43 promesas</div></label>
+          <label class="tc" onclick="tog(this,'economia')"><input type="checkbox"><div class="tck"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><path d="M1.5 5l2.5 2.5 4.5-4"/></svg></div><div class="ti">📊</div><div class="tn">Economía</div><div class="td">Deuda, déficit, impuestos</div><div class="tc2">89 promesas</div></label>
+          <label class="tc" onclick="tog(this,'pensiones')"><input type="checkbox"><div class="tck"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><path d="M1.5 5l2.5 2.5 4.5-4"/></svg></div><div class="ti">🏛️</div><div class="tn">Pensiones</div><div class="td">Jubilación, cotizaciones</div><div class="tc2">34 promesas</div></label>
+          <label class="tc" onclick="tog(this,'empleo')"><input type="checkbox"><div class="tck"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><path d="M1.5 5l2.5 2.5 4.5-4"/></svg></div><div class="ti">💼</div><div class="tn">Empleo</div><div class="td">SMI, ERTEs, jornada</div><div class="tc2">61 promesas</div></label>
+          <label class="tc" onclick="tog(this,'sanidad')"><input type="checkbox"><div class="tck"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><path d="M1.5 5l2.5 2.5 4.5-4"/></svg></div><div class="ti">🏥</div><div class="tn">Sanidad</div><div class="td">Sanidad pública, fármacos</div><div class="tc2">52 promesas</div></label>
+          <label class="tc" onclick="tog(this,'educacion')"><input type="checkbox"><div class="tck"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><path d="M1.5 5l2.5 2.5 4.5-4"/></svg></div><div class="ti">🎓</div><div class="tn">Educación</div><div class="td">Universidad, becas, 0-3</div><div class="tc2">38 promesas</div></label>
+          <label class="tc" onclick="tog(this,'energia')"><input type="checkbox"><div class="tck"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><path d="M1.5 5l2.5 2.5 4.5-4"/></svg></div><div class="ti">⚡</div><div class="tn">Energía</div><div class="td">Luz, gas, renovables</div><div class="tc2">29 promesas</div></label>
+          <label class="tc" onclick="tog(this,'medioambiente')"><input type="checkbox"><div class="tck"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><path d="M1.5 5l2.5 2.5 4.5-4"/></svg></div><div class="ti">🌿</div><div class="tn">Medio ambiente</div><div class="td">Clima, agua, biodiversidad</div><div class="tc2">31 promesas</div></label>
+        </div>
+        <button class="bp" id="nb1" onclick="go(2)" disabled>Continuar →</button>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="sp2" id="s2">
+        <div style="font-size:13px;color:rgba(245,240,232,.7);margin-bottom:14px;">¿Con qué frecuencia quieres recibir actualizaciones?</div>
+        <div class="fo">
+          <label class="fop" onclick="sf(this,'inmediata')"><input type="radio" name="fr"><div class="fr"></div><div style="flex:1"><div class="fn">Alerta inmediata</div><div class="fdesc">Cada vez que algo cambia. Máximo 1 email/día.</div></div><span class="fb">Recomendado</span></label>
+          <label class="fop" onclick="sf(this,'semanal')"><input type="radio" name="fr"><div class="fr"></div><div><div class="fn">Resumen semanal</div><div class="fdesc">Un email los lunes con todo lo relevante.</div></div></label>
+          <label class="fop" onclick="sf(this,'mensual')"><input type="radio" name="fr"><div class="fr"></div><div><div class="fn">Informe mensual</div><div class="fdesc">Resumen profundo el primer lunes del mes.</div></div></label>
+        </div>
+        <div style="margin-bottom:18px;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">¿Qué partidos seguir?</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:rgba(245,240,232,.65)"><input type="checkbox" checked style="accent-color:var(--red)">Gobierno (PSOE+Sumar)</label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:rgba(245,240,232,.65)"><input type="checkbox" style="accent-color:var(--red)">PP</label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:rgba(245,240,232,.65)"><input type="checkbox" style="accent-color:var(--red)">VOX</label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:rgba(245,240,232,.65)"><input type="checkbox" style="accent-color:var(--red)">Todos</label>
+          </div>
+        </div>
+        <button class="bp" id="nb2" onclick="go(3)" disabled>Continuar →</button>
+        <button class="bg" onclick="go(1)">← Volver</button>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="sp2" id="s3">
+        <div style="font-size:13px;color:rgba(245,240,232,.7);margin-bottom:18px;">Último paso — ¿cómo te enviamos las alertas?</div>
+        <div class="fr2" style="margin-bottom:0">
+          <div><label class="fl">Nombre</label><input class="fi" type="text" placeholder="Ana" id="fn2"></div>
+          <div><label class="fl">Apellido</label><input class="fi" type="text" placeholder="García" id="ln2"></div>
+        </div>
+        <label class="fl">Email</label>
+        <input class="fi" type="email" placeholder="ana@ejemplo.es" id="em2" oninput="ce()">
+        <div style="margin-bottom:18px;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;">Elige tu plan</div>
+          <div class="plg">
+            <div class="plc sel" onclick="sp2(this)"><div class="plck"></div><div class="pln">Ciudadano</div><div class="plp">Gratis</div><div class="plper">siempre</div><div class="plfs"><div class="plf">Alertas semanales</div><div class="plf">Hasta 3 temas</div><div class="plf">Acceso web completo</div></div></div>
+            <div class="plc feat" onclick="sp2(this)"><div class="plck"></div><div class="pp">Más popular</div><div class="pln">Activo</div><div class="plp">4<span style="font-size:12px;color:var(--muted)">€</span></div><div class="plper">al mes · cancela cuando quieras</div><div class="plfs"><div class="plf">Alertas inmediatas</div><div class="plf">Temas ilimitados</div><div class="plf">Informe mensual PDF</div><div class="plf">Sin publicidad nunca</div></div></div>
+            <div class="plc" onclick="sp2(this)"><div class="plck"></div><div class="pln">Mecenas</div><div class="plp">12<span style="font-size:12px;color:var(--muted)">€</span></div><div class="plper">al mes</div><div class="plfs"><div class="plf">Todo lo del plan Activo</div><div class="plf">Donación al proyecto</div><div class="plf">Badge en créditos</div><div class="plf">Acceso funciones beta</div></div></div>
+          </div>
+        </div>
+        <button class="bp" id="sb" onclick="sub()" disabled>Activar mis alertas →</button>
+        <button class="bg" onclick="go(2)">← Volver</button>
+        <p class="fne">Al registrarte aceptas los <a href="#">Términos</a> y la <a href="#">Privacidad</a>.<br>Tus datos no se venden ni comparten. Nunca.</p>
+      </div>
+
+      <!-- SUCCESS -->
+      <div class="suc" id="suc">
+        <div class="si2"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#81c784" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <h2 class="st2">¡Ya estás dentro!</h2>
+        <p class="ss2">Revisa tu email — te hemos enviado un enlace de confirmación. Cuando lo confirmes, recibirás alertas sobre:</p>
+        <div class="stl" id="stl"></div>
+        <a href="democraticai.html" style="display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:var(--red);color:var(--paper);padding:11px 26px;border-radius:3px;text-decoration:none;">Explorar el dashboard →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BENEFITS -->
+<div class="bn">
+  <div class="bc2"><div class="bi"><svg viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7.5" cy="7.5" r="5.5"/><path d="M7.5 4.5v3.5l2 1.5"/></svg></div><div class="btt">Alertas en tiempo real</div><div class="bds">El BOE publica algo en tus temas — lo analizamos en minutos y te lo explicamos en lenguaje claro, con el enlace oficial siempre visible.</div></div>
+  <div class="bc2"><div class="bi"><svg viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="11" height="9" rx="1"/><path d="M5 7h5M5 9h3"/></svg></div><div class="btt">Seguimiento de promesas</div><div class="bds">Cuando una promesa de tu área cambia de estado, te avisamos con la evidencia completa: el texto del BOE, el análisis y el score de confianza.</div></div>
+  <div class="bc2"><div class="bi"><svg viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11V8l5.5-6.5 5.5 6.5v3H9V9H6v2H2z"/></svg></div><div class="btt">Indicadores clave</div><div class="bds">Cuando el INE publica un dato relevante para tu área — IPC, paro sectorial, precio del alquiler — te lo resumimos con contexto histórico.</div></div>
+</div>
+</div>
+
+<footer style="border-top:1px solid var(--rule);padding:16px clamp(16px,3vw,52px);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+  <p style="font-family:var(--mono);font-size:9px;color:rgba(245,240,232,.2);">DemocraticAI · Sin publicidad · Sin venta de datos · AGPL-3.0</p>
+  <span style="font-family:var(--mono);font-size:9px;color:#81c784;border:1px solid rgba(129,199,132,.22);padding:3px 8px;border-radius:2px;">⬡ Open Source</span>
+</footer>
+
+<script>
+const tops=new Set();
+let freq=null;
+function tog(el,v){el.classList.toggle('sel');tops.has(v)?tops.delete(v):tops.add(v);document.getElementById('nb1').disabled=tops.size===0;}
+function sf(el){document.querySelectorAll('.fop').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');freq=el.querySelector('input').value;document.getElementById('nb2').disabled=false;}
+function sp2(el){document.querySelectorAll('.plc').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');}
+function ce(){const ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('em2').value);document.getElementById('sb').disabled=!ok;}
+function go(n){
+  document.querySelectorAll('.sp2').forEach(p=>p.classList.remove('act'));
+  document.getElementById('s'+n).classList.add('act');
+  document.getElementById('pf').style.width=(n*33.33)+'%';
+  ['sd1','sd2','sd3'].forEach((id,i)=>{
+    const el=document.getElementById(id);el.className='sd';
+    if(i+1<n)el.classList.add('dn');
+    else if(i+1===n)el.classList.add('act');
+    else el.classList.add('pn');
+  });
+}
+const tLabels={vivienda:'🏠 Vivienda',economia:'📊 Economía',pensiones:'🏛️ Pensiones',empleo:'💼 Empleo',sanidad:'🏥 Sanidad',educacion:'🎓 Educación',energia:'⚡ Energía',medioambiente:'🌿 Medio ambiente'};
+function sub(){
+  document.querySelectorAll('.sp2').forEach(p=>p.classList.remove('act'));
+  document.getElementById('suc').style.display='block';
+  document.getElementById('formHeader').style.display='none';
+  document.getElementById('pf').style.width='100%';
+  const wrap=document.getElementById('stl');
+  tops.forEach(t=>{const s=document.createElement('span');s.className='stg';s.textContent=tLabels[t]||t;wrap.appendChild(s);});
+}
+</script>
+</body>
+</html>

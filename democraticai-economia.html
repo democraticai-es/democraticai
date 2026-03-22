@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Indicadores Económicos — DemocraticAI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
+<style>
+:root{--ink:#0c0b09;--paper:#f2ede3;--red:#bf3a2b;--gold:#c8a24a;--muted:#6a6158;--rule:rgba(242,237,227,.07);--surface:rgba(242,237,227,.035);--surface2:rgba(242,237,227,.06);--mono:'DM Mono',monospace;--serif:'Playfair Display',Georgia,serif;--sans:'DM Sans',sans-serif;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--sans);background:var(--ink);color:var(--paper);overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");opacity:.3;pointer-events:none;z-index:0;}
+.masthead{border-bottom:1px solid var(--rule);padding:0 clamp(18px,3.5vw,56px);display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:200;background:rgba(12,11,9,.95);backdrop-filter:blur(14px);}
+.mast-left{display:flex;align-items:center;gap:18px;}
+.back-link{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:5px;transition:color .2s;}
+.back-link:hover{color:var(--paper);}
+.sep-v{width:1px;height:14px;background:var(--rule);}
+.breadcrumb{font-family:var(--mono);font-size:10px;color:var(--muted);display:flex;align-items:center;gap:7px;}
+.breadcrumb span{color:rgba(242,237,227,.4);}
+.wordmark{font-family:var(--serif);font-weight:700;font-size:15px;color:var(--paper);text-decoration:none;}
+.wordmark em{color:var(--red);font-style:normal;}
+.mast-right{display:flex;align-items:center;gap:12px;}
+.ine-badge{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:2px;border:1px solid rgba(76,175,80,.3);color:#81c784;display:flex;align-items:center;gap:5px;}
+.ine-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:#4caf50;animation:pulse 2.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.update-label{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.06em;}
+.page{max-width:1380px;margin:0 auto;padding:0 clamp(18px,3.5vw,56px) 80px;}
+.page-header{padding:36px 0 28px;border-bottom:1px solid var(--rule);margin-bottom:28px;display:grid;grid-template-columns:1fr auto;align-items:end;gap:24px;}
+.ph-eyebrow{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--red);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.ph-eyebrow::before{content:'';width:20px;height:1px;background:var(--red);}
+.ph-title{font-family:var(--serif);font-size:clamp(26px,3.2vw,42px);font-weight:900;line-height:1.05;color:var(--paper);letter-spacing:-.02em;}
+.ph-title em{font-style:italic;color:rgba(242,237,227,.55);}
+.ph-sub{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.6;max-width:560px;}
+.period-label{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;text-align:right;}
+.period-btns{display:flex;gap:4px;}
+.period-btn{font-family:var(--mono);font-size:10px;letter-spacing:.06em;padding:6px 12px;border-radius:2px;border:1px solid rgba(242,237,227,.12);background:transparent;color:rgba(242,237,227,.4);cursor:pointer;transition:all .18s;}
+.period-btn:hover{border-color:rgba(242,237,227,.3);color:rgba(242,237,227,.8);}
+.period-btn.active{background:var(--red);border-color:var(--red);color:var(--paper);}
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:6px;overflow:hidden;margin-bottom:24px;}
+.kpi{background:var(--surface);padding:20px 18px;cursor:pointer;transition:background .18s;border-bottom:2px solid transparent;}
+.kpi:hover{background:var(--surface2);}
+.kpi.active{background:var(--surface2);border-bottom-color:var(--red);}
+.kpi-tag{font-family:var(--mono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.kpi-val{font-family:var(--serif);font-size:28px;font-weight:700;line-height:1;color:var(--paper);margin-bottom:5px;}
+.kpi-val.bad{color:#e57373;}.kpi-val.good{color:#81c784;}.kpi-val.neutral{color:var(--gold);}
+.kpi-delta{font-family:var(--mono);font-size:10px;color:var(--muted);}
+.kpi-delta .up{color:#81c784;}.kpi-delta .down{color:#e57373;}
+.chart-wrap{background:var(--surface);border:1px solid var(--rule);border-radius:6px;overflow:hidden;margin-bottom:20px;}
+.chart-header{padding:16px 20px 0;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.chart-title{font-family:var(--serif);font-size:19px;font-weight:700;color:var(--paper);margin-bottom:3px;}
+.chart-sub{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.06em;}
+.chart-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.toggle-events{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:2px;border:1px solid rgba(242,237,227,.15);background:transparent;color:rgba(242,237,227,.45);cursor:pointer;transition:all .18s;}
+.toggle-events.on{background:rgba(201,162,74,.12);border-color:rgba(201,162,74,.3);color:var(--gold);}
+.source-tag{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.06em;}
+.source-tag a{color:var(--gold);text-decoration:none;}
+.source-tag a:hover{text-decoration:underline;}
+.chart-canvas-wrap{padding:16px 20px 20px;position:relative;}
+.chart-canvas-wrap canvas{max-height:260px;}
+.events-legend{padding:0 20px 14px;display:flex;gap:20px;flex-wrap:wrap;}
+.ev-item{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.06em;}
+.charts-2col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+.deuda-detail{display:grid;grid-template-columns:1fr 280px;gap:16px;margin-bottom:20px;}
+.deuda-detail .chart-wrap{margin-bottom:0;}
+.deuda-side{display:flex;flex-direction:column;gap:12px;}
+.fact-card{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:16px;}
+.fact-card-label{font-family:var(--mono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.fact-card-val{font-family:var(--serif);font-size:24px;font-weight:700;color:var(--paper);margin-bottom:4px;}
+.fact-card-val.red{color:#e57373;}.fact-card-val.green{color:#81c784;}
+.fact-card-sub{font-size:12px;color:var(--muted);line-height:1.5;}
+.cbar-label{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--muted);margin:8px 0 4px;}
+.cbar-track{height:4px;background:rgba(242,237,227,.07);border-radius:3px;overflow:hidden;}
+.cbar-fill{height:100%;border-radius:3px;}
+.indicator-table{background:var(--surface);border:1px solid var(--rule);border-radius:6px;overflow:hidden;margin-bottom:20px;}
+.it-header{padding:14px 20px;border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between;}
+.it-title{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--paper);}
+.it-sub{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.06em;}
+.it-row{display:grid;grid-template-columns:200px 1fr 80px 80px 110px;align-items:center;gap:16px;padding:13px 20px;border-bottom:1px solid rgba(242,237,227,.03);transition:background .15s;cursor:pointer;}
+.it-row:last-child{border-bottom:none;}
+.it-row:hover{background:var(--surface2);}
+.it-row.hdr{padding:8px 20px;border-bottom:1px solid var(--rule);cursor:default;background:transparent!important;}
+.col-lbl{font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.it-name{font-size:13px;color:rgba(242,237,227,.8);}
+.it-name small{font-family:var(--mono);font-size:9px;color:var(--muted);display:block;margin-top:1px;}
+.it-spark{height:34px;position:relative;}
+.it-spark canvas{width:100%!important;height:34px!important;}
+.it-curr{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--paper);text-align:right;}
+.it-chg{font-family:var(--mono);font-size:10px;text-align:right;}
+.it-chg.pos{color:#81c784;}.it-chg.neg{color:#e57373;}.it-chg.neu{color:var(--muted);}
+.it-status{display:flex;justify-content:flex-end;}
+.it-pill{font-family:var(--mono);font-size:8px;letter-spacing:.06em;text-transform:uppercase;padding:3px 7px;border-radius:2px;}
+.it-pill.good{background:rgba(76,175,80,.12);color:#81c784;}.it-pill.bad{background:rgba(229,115,115,.12);color:#e57373;}.it-pill.mid{background:rgba(239,159,39,.12);color:#ffd54f;}
+.europa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:6px;overflow:hidden;margin-bottom:20px;}
+.eu-card{background:var(--surface);padding:16px 14px;position:relative;}
+.eu-card.hl{background:rgba(191,58,43,.07);border:1px solid rgba(191,58,43,.2);}
+.eu-flag{font-size:18px;margin-bottom:6px;}
+.eu-country{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.eu-val{font-family:var(--serif);font-size:22px;font-weight:700;color:var(--paper);}
+.eu-label{font-family:var(--mono);font-size:8.5px;color:var(--muted);margin-top:2px;}
+.eu-bar{height:3px;background:rgba(242,237,227,.08);border-radius:2px;overflow:hidden;margin-top:8px;}
+.eu-bar-fill{height:100%;border-radius:2px;}
+.eu-rank{position:absolute;top:10px;right:10px;font-family:var(--mono);font-size:8px;color:var(--muted);}
+.events-timeline{background:var(--surface);border:1px solid var(--rule);border-radius:6px;overflow:hidden;margin-bottom:20px;}
+.ev-tl-hdr{padding:14px 20px;border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between;}
+.ev-tl-title{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--paper);}
+.ev-entry{display:grid;grid-template-columns:64px 14px 1fr;gap:0 14px;padding:12px 20px;border-bottom:1px solid rgba(242,237,227,.03);align-items:start;}
+.ev-entry:last-child{border-bottom:none;}
+.ev-year{font-family:var(--mono);font-size:10px;color:var(--muted);text-align:right;padding-top:3px;}
+.ev-dot-col{display:flex;flex-direction:column;align-items:center;}
+.ev-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;border:1.5px solid;}
+.ev-dot.crisis{border-color:#e57373;background:rgba(229,115,115,.15);}
+.ev-dot.reform{border-color:#81c784;background:rgba(129,199,132,.15);}
+.ev-dot.gov{border-color:var(--gold);background:rgba(201,162,74,.15);}
+.ev-dot.election{border-color:#64b5f6;background:rgba(100,181,246,.15);}
+.ev-line{width:1px;flex:1;background:rgba(242,237,227,.05);min-height:14px;margin-top:3px;}
+.ev-title-t{font-size:13px;color:rgba(242,237,227,.8);margin-bottom:2px;line-height:1.4;}
+.ev-title-t strong{color:var(--paper);font-weight:500;}
+.ev-impact{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.04em;}
+.page-footer{border-top:1px solid var(--rule);margin-top:20px;padding:18px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.page-footer p{font-family:var(--mono);font-size:9px;color:rgba(242,237,227,.2);letter-spacing:.05em;}
+.open-badge{font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:#81c784;border:1px solid rgba(129,199,132,.25);padding:3px 9px;border-radius:2px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.page-header,.kpi-row,.chart-wrap,.charts-2col,.deuda-detail,.indicator-table,.events-timeline,.europa-grid{animation:fadeUp .5s ease both .08s;}
+@media(max-width:1100px){.kpi-row{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:860px){.charts-2col,.deuda-detail{grid-template-columns:1fr;}.europa-grid{grid-template-columns:repeat(2,1fr);}.it-row{grid-template-columns:1fr 1fr 60px 100px;}.it-spark{display:none;}.page-header{grid-template-columns:1fr;}}
+@media(max-width:540px){.kpi-row{grid-template-columns:repeat(2,1fr);}}
+</style>
+  <meta name="description" content="Deuda pública, PIB, paro e IPC en series históricas desde el año 2000. Datos directos del INE con contexto europeo.">
+  <meta property="og:title" content="La economía española en datos — DemocraticAI">
+  <meta property="og:description" content="Deuda pública, PIB, paro e IPC en series históricas desde el año 2000. Datos directos del INE con contexto europeo.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="DemocraticAI">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="La economía española en datos — DemocraticAI">
+  <meta name="twitter:description" content="Deuda pública, PIB, paro e IPC en series históricas desde el año 2000. Datos directos del INE con contexto europeo.">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="mast-left">
+    <a href="democraticai.html" class="back-link"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2L4 6l4 4"/></svg>Inicio</a>
+    <div class="sep-v"></div>
+    <div class="breadcrumb">Dashboard <span>›</span> Indicadores económicos</div>
+  </div>
+  <a href="democraticai.html" class="wordmark">Democratic<em>AI</em></a>
+  <div class="mast-right">
+    <div class="ine-badge">INE conectado</div>
+    <div class="update-label">Actualizado 21 mar 2026 · 07:00h</div>
+  </div>
+</header>
+
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="ph-eyebrow">Fuentes: INE · Banco de España · Eurostat · IGAE · BOE</div>
+      <h1 class="ph-title">Indicadores económicos<br><em>de España en contexto</em></h1>
+      <p class="ph-sub">Series históricas desde 2000 con anotaciones de eventos políticos clave. Sin interpretación editorial, solo datos de fuentes oficiales.</p>
+    </div>
+    <div>
+      <div class="period-label">Período de visualización</div>
+      <div class="period-btns">
+        <button class="period-btn" onclick="setPeriod(5,this)">5A</button>
+        <button class="period-btn" onclick="setPeriod(10,this)">10A</button>
+        <button class="period-btn active" onclick="setPeriod(25,this)">25A</button>
+        <button class="period-btn" onclick="setPeriod(0,this)">Todo</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi active" onclick="showChart('deuda',this)"><div class="kpi-tag">Deuda pública / PIB</div><div class="kpi-val bad">108.3<span style="font-size:14px;color:var(--muted)">%</span></div><div class="kpi-delta"><span class="down">▲ +2.1pp</span> vs 2023</div></div>
+    <div class="kpi" onclick="showChart('paro',this)"><div class="kpi-tag">Tasa de paro</div><div class="kpi-val neutral">11.2<span style="font-size:14px;color:var(--muted)">%</span></div><div class="kpi-delta"><span class="up">▼ -1.3pp</span> vs 2023</div></div>
+    <div class="kpi" onclick="showChart('pib',this)"><div class="kpi-tag">Crecimiento PIB</div><div class="kpi-val good">+2.7<span style="font-size:14px;color:var(--muted)">%</span></div><div class="kpi-delta"><span class="up">▲ +0.4pp</span> vs 2023</div></div>
+    <div class="kpi" onclick="showChart('ipc',this)"><div class="kpi-tag">IPC interanual</div><div class="kpi-val neutral">2.8<span style="font-size:14px;color:var(--muted)">%</span></div><div class="kpi-delta"><span class="up">▼ -0.4pp</span> vs feb</div></div>
+    <div class="kpi" onclick="showChart('deficit',this)"><div class="kpi-tag">Déficit público / PIB</div><div class="kpi-val bad">-3.7<span style="font-size:14px;color:var(--muted)">%</span></div><div class="kpi-delta"><span class="neu">— Sin variación</span> vs 2023</div></div>
+  </div>
+
+  <div class="chart-wrap">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title" id="mc-title">Deuda pública sobre PIB</div>
+        <div class="chart-sub" id="mc-sub">ESPAÑA · 2000–2026 · % del PIB · Banco de España / Eurostat</div>
+      </div>
+      <div class="chart-controls">
+        <button class="toggle-events on" id="evBtn" onclick="toggleEv()">◉ Eventos políticos</button>
+        <div class="source-tag">Fuente: <a href="https://www.bde.es" target="_blank">BdE</a> · <a href="https://ec.europa.eu/eurostat" target="_blank">Eurostat</a></div>
+      </div>
+    </div>
+    <div class="chart-canvas-wrap"><canvas id="mainC"></canvas></div>
+    <div class="events-legend" id="evLeg">
+      <div class="ev-item"><div style="width:10px;height:10px;background:#64b5f6;border-radius:2px;"></div>Elecciones generales</div>
+      <div class="ev-item"><div style="width:10px;height:10px;background:#e57373;border-radius:2px;"></div>Crisis / shock económico</div>
+      <div class="ev-item"><div style="width:10px;height:10px;background:#81c784;border-radius:2px;"></div>Reforma estructural</div>
+      <div class="ev-item"><div style="width:10px;height:10px;background:#c8a24a;border-radius:2px;"></div>Cambio de gobierno</div>
+    </div>
+  </div>
+
+  <div class="charts-2col">
+    <div class="chart-wrap" style="margin-bottom:0">
+      <div class="chart-header">
+        <div><div class="chart-title">Tasa de desempleo</div><div class="chart-sub">ESPAÑA vs UE-27 · % población activa · INE / Eurostat</div></div>
+        <div class="source-tag"><a href="https://www.ine.es" target="_blank">EPA-INE</a></div>
+      </div>
+      <div class="chart-canvas-wrap"><canvas id="paroC"></canvas></div>
+    </div>
+    <div class="chart-wrap" style="margin-bottom:0">
+      <div class="chart-header">
+        <div><div class="chart-title">IPC — Inflación general</div><div class="chart-sub">Variación interanual % · INE</div></div>
+        <div class="source-tag"><a href="https://www.ine.es" target="_blank">INE-IPC</a></div>
+      </div>
+      <div class="chart-canvas-wrap"><canvas id="ipcC"></canvas></div>
+    </div>
+  </div>
+
+  <div class="deuda-detail">
+    <div class="chart-wrap">
+      <div class="chart-header">
+        <div><div class="chart-title">Composición del gasto público</div><div class="chart-sub">Presupuesto consolidado AAPP 2022 vs 2024 · Miles de millones €</div></div>
+        <div class="source-tag"><a href="https://www.igae.pap.hacienda.gob.es" target="_blank">IGAE</a></div>
+      </div>
+      <div class="chart-canvas-wrap"><canvas id="gastoC"></canvas></div>
+    </div>
+    <div class="deuda-side">
+      <div class="fact-card">
+        <div class="fact-card-label">Deuda per cápita</div>
+        <div class="fact-card-val red">29.847 <span style="font-size:14px;color:var(--muted)">€</span></div>
+        <div class="fact-card-sub">Por cada ciudadano español, incluidos menores de edad.</div>
+        <div class="cbar-label"><span>España</span><span>UE media: 24.200€</span></div>
+        <div class="cbar-track"><div class="cbar-fill" style="width:82%;background:#e57373"></div></div>
+      </div>
+      <div class="fact-card">
+        <div class="fact-card-label">Intereses de la deuda (2024)</div>
+        <div class="fact-card-val red">37.2 <span style="font-size:14px;color:var(--muted)">B€</span></div>
+        <div class="fact-card-sub">El 2.7% del PIB va a pagar intereses. Equivale a todo el presupuesto de Sanidad.</div>
+      </div>
+      <div class="fact-card">
+        <div class="fact-card-label">Superávit primario</div>
+        <div class="fact-card-val green">+1.2 <span style="font-size:14px;color:var(--muted)">%</span></div>
+        <div class="fact-card-sub">Sin contar intereses, las AAPP tienen superávit. El problema es la deuda heredada.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="indicator-table">
+    <div class="it-header"><div><div class="it-title">Panel de indicadores</div><div class="it-sub">Todos los indicadores macroeconómicos oficiales · Actualización trimestral</div></div><div class="source-tag">INE · BdE · Eurostat · IGAE</div></div>
+    <div class="it-row hdr"><div class="col-lbl">Indicador</div><div class="col-lbl">Evolución 10A</div><div class="col-lbl" style="text-align:right">Actual</div><div class="col-lbl" style="text-align:right">Variación</div><div class="col-lbl" style="text-align:right">Estado</div></div>
+    <div class="it-row"><div class="it-name">Deuda pública / PIB<small>Banco de España · Trimestral</small></div><div class="it-spark"><canvas id="sp1"></canvas></div><div class="it-curr">108.3%</div><div class="it-chg neg">▲ +2.1pp</div><div class="it-status"><span class="it-pill bad">Deterioro</span></div></div>
+    <div class="it-row"><div class="it-name">Tasa de paro EPA<small>INE · Trimestral</small></div><div class="it-spark"><canvas id="sp2"></canvas></div><div class="it-curr">11.2%</div><div class="it-chg pos">▼ -1.3pp</div><div class="it-status"><span class="it-pill mid">Mejora lenta</span></div></div>
+    <div class="it-row"><div class="it-name">Crecimiento PIB real<small>INE · Anual · Base 2015</small></div><div class="it-spark"><canvas id="sp3"></canvas></div><div class="it-curr">+2.7%</div><div class="it-chg pos">▲ +0.4pp</div><div class="it-status"><span class="it-pill good">Favorable</span></div></div>
+    <div class="it-row"><div class="it-name">IPC general<small>INE · Mensual</small></div><div class="it-spark"><canvas id="sp4"></canvas></div><div class="it-curr">2.8%</div><div class="it-chg pos">▼ -0.4pp</div><div class="it-status"><span class="it-pill mid">En objetivo</span></div></div>
+    <div class="it-row"><div class="it-name">Déficit AAPP / PIB<small>IGAE · Anual · Criterio PDE</small></div><div class="it-spark"><canvas id="sp5"></canvas></div><div class="it-curr">-3.7%</div><div class="it-chg neg">— Sin cambio</div><div class="it-status"><span class="it-pill bad">Sobre objetivo</span></div></div>
+    <div class="it-row"><div class="it-name">Salario medio bruto<small>INE · ETCL · Anual</small></div><div class="it-spark"><canvas id="sp6"></canvas></div><div class="it-curr">27.840€</div><div class="it-chg pos">▲ +3.2%</div><div class="it-status"><span class="it-pill good">Favorable</span></div></div>
+    <div class="it-row"><div class="it-name">Inversión extranjera directa<small>Secretaría de Estado · Anual</small></div><div class="it-spark"><canvas id="sp7"></canvas></div><div class="it-curr">28.4 B€</div><div class="it-chg pos">▲ +8.1%</div><div class="it-status"><span class="it-pill good">Favorable</span></div></div>
+  </div>
+
+  <div style="margin-bottom:16px;"><div style="font-family:var(--serif);font-size:19px;font-weight:700;color:var(--paper);margin-bottom:4px;">Comparativa europea — Deuda / PIB 2024</div><div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.06em;">Fuente: Eurostat · Datos provisionales · Ordenados por nivel de deuda</div></div>
+  <div class="europa-grid">
+    <div class="eu-card"><div class="eu-flag">🇬🇷</div><div class="eu-country">Grecia</div><div class="eu-val">163<span style="font-size:13px;color:var(--muted)">%</span></div><div class="eu-label">Deuda / PIB</div><div class="eu-bar"><div class="eu-bar-fill" style="width:100%;background:#e57373"></div></div><div class="eu-rank">#1 más alta</div></div>
+    <div class="eu-card"><div class="eu-flag">🇮🇹</div><div class="eu-country">Italia</div><div class="eu-val">139<span style="font-size:13px;color:var(--muted)">%</span></div><div class="eu-label">Deuda / PIB</div><div class="eu-bar"><div class="eu-bar-fill" style="width:85%;background:#e57373"></div></div><div class="eu-rank">#2 más alta</div></div>
+    <div class="eu-card hl"><div class="eu-flag">🇪🇸</div><div class="eu-country">España</div><div class="eu-val" style="color:#e57373">108<span style="font-size:13px;color:var(--muted)">%</span></div><div class="eu-label">Deuda / PIB</div><div class="eu-bar"><div class="eu-bar-fill" style="width:66%;background:#c0392b"></div></div><div class="eu-rank">#3 más alta</div></div>
+    <div class="eu-card"><div class="eu-flag">🇫🇷</div><div class="eu-country">Francia</div><div class="eu-val">112<span style="font-size:13px;color:var(--muted)">%</span></div><div class="eu-label">Deuda / PIB</div><div class="eu-bar"><div class="eu-bar-fill" style="width:69%;background:var(--gold)"></div></div><div class="eu-rank">#4 más alta</div></div>
+    <div class="eu-card"><div class="eu-flag">🇵🇹</div><div class="eu-country">Portugal</div><div class="eu-val">99<span style="font-size:13px;color:var(--muted)">%</span></div><div class="eu-label">Deuda / PIB</div><div class="eu-bar"><div class="eu-bar-fill" style="width:61%;background:var(--gold)"></div></div><div class="eu-rank">#5 más alta</div></div>
+    <div class="eu-card"><div class="eu-flag">🇩🇪</div><div class="eu-country">Alemania</div><div class="eu-val">64<span style="font-size:13px;color:var(--muted)">%</span></div><div class="eu-label">Deuda / PIB</div><div class="eu-bar"><div class="eu-bar-fill" style="width:39%;background:#81c784"></div></div><div class="eu-rank">Baja</div></div>
+    <div class="eu-card"><div class="eu-flag">🇳🇱</div><div class="eu-country">Países Bajos</div><div class="eu-val">47<span style="font-size:13px;color:var(--muted)">%</span></div><div class="eu-label">Deuda / PIB</div><div class="eu-bar"><div class="eu-bar-fill" style="width:29%;background:#81c784"></div></div><div class="eu-rank">Baja</div></div>
+    <div class="eu-card"><div class="eu-flag">🇸🇪</div><div class="eu-country">Suecia</div><div class="eu-val">31<span style="font-size:13px;color:var(--muted)">%</span></div><div class="eu-label">Deuda / PIB</div><div class="eu-bar"><div class="eu-bar-fill" style="width:19%;background:#81c784"></div></div><div class="eu-rank">Muy baja</div></div>
+  </div>
+
+  <div class="events-timeline">
+    <div class="ev-tl-hdr"><div class="ev-tl-title">Eventos políticos con impacto económico verificado</div><div class="source-tag">BOE · Congreso · INE</div></div>
+    <div class="ev-entry"><div class="ev-year">2008</div><div class="ev-dot-col"><div class="ev-dot crisis"></div><div class="ev-line"></div></div><div><div class="ev-title-t"><strong>Crisis financiera global.</strong> Deuda pasa de 39% a 60% del PIB en 2 años. Déficit alcanza -11.2%.</div><div class="ev-impact">Impacto deuda: +21pp · Impacto paro: +14pp (hasta 26% en 2013)</div></div></div>
+    <div class="ev-entry"><div class="ev-year">2012</div><div class="ev-dot-col"><div class="ev-dot reform"></div><div class="ev-line"></div></div><div><div class="ev-title-t"><strong>Reforma laboral (RDL 3/2012).</strong> Gobierno Rajoy. Abarata despido, reduce indemnizaciones.</div><div class="ev-impact">Fuente: BOE A-2012-3032 · Paro posterior: baja de 26% a 14% en 6 años</div></div></div>
+    <div class="ev-entry"><div class="ev-year">2018</div><div class="ev-dot-col"><div class="ev-dot gov"></div><div class="ev-line"></div></div><div><div class="ev-title-t"><strong>Moción de censura. Cambio de gobierno.</strong> PSOE sustituye al PP. Inicio de aumentos del SMI.</div><div class="ev-impact">SMI 2018: 735€ → 2024: 1.134€ · Incremento acumulado: +54%</div></div></div>
+    <div class="ev-entry"><div class="ev-year">2020</div><div class="ev-dot-col"><div class="ev-dot crisis"></div><div class="ev-line"></div></div><div><div class="ev-title-t"><strong>Pandemia COVID-19.</strong> PIB cae -10.8%. Deuda sube de 98% a 120% del PIB en un año.</div><div class="ev-impact">Mayor caída del PIB en democracia · ERTE protegieron 3.6M empleos · Déficit: -10.1%</div></div></div>
+    <div class="ev-entry"><div class="ev-year">2021</div><div class="ev-dot-col"><div class="ev-dot reform"></div><div class="ev-line"></div></div><div><div class="ev-title-t"><strong>Fondos Next Generation EU.</strong> España recibe 69.500M€ para recuperación y transición verde.</div><div class="ev-impact">Impacto estimado: +1.5pp PIB/año · Fondos ejecutados a 2025: 42%</div></div></div>
+    <div class="ev-entry"><div class="ev-year">2022</div><div class="ev-dot-col"><div class="ev-dot crisis"></div><div class="ev-line"></div></div><div><div class="ev-title-t"><strong>Shock energético. Invasión de Ucrania.</strong> IPC alcanza máximos históricos: 10.8% en julio 2022.</div><div class="ev-impact">Medidas del Gobierno: -0.3pp PIB en subsidios energéticos · IPC actual: 2.8%</div></div></div>
+    <div class="ev-entry"><div class="ev-year">2023</div><div class="ev-dot-col"><div class="ev-dot election"></div></div><div><div class="ev-title-t"><strong>Elecciones generales 23J.</strong> PSOE renueva gobierno en coalición con Sumar.</div><div class="ev-impact">Compromisos económicos analizados en DemocraticAI: 412 promesas · Ver dashboard →</div></div></div>
+  </div>
+
+  <div class="page-footer">
+    <p>DemocraticAI · Datos: INE, Banco de España, Eurostat, IGAE, BOE · Open Source (AGPL-3.0) · Sin financiación partidista</p>
+    <span class="open-badge">⬡ Open Source</span>
+  </div>
+</div>
+
+<script>
+const YEARS=['2000','2001','2002','2003','2004','2005','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'];
+const D={
+  deuda:[59.4,55.5,52.6,48.8,46.3,43.2,39.7,36.3,40.2,54.0,60.1,70.5,86.3,95.5,100.4,99.3,99.0,98.3,97.4,95.5,120.0,118.4,113.2,107.7,108.3,107.1],
+  paro:[13.9,10.6,11.5,11.5,11.0,9.2,8.5,8.2,11.3,18.0,20.1,21.7,25.0,26.1,24.4,22.1,19.6,17.2,15.3,14.1,15.5,14.8,12.9,12.2,11.2,10.4],
+  pib:[5.3,4.0,2.9,3.1,3.2,3.7,4.2,3.8,-1.0,-3.6,0.0,-1.0,-2.9,-1.7,1.4,3.8,3.0,3.0,2.4,2.0,-10.8,5.5,5.8,2.5,2.7,2.4],
+  ipc:[3.5,3.6,3.6,3.0,3.0,3.7,3.5,2.8,4.1,-0.3,1.8,3.2,2.4,1.4,-0.2,-0.5,-0.3,2.0,1.7,0.8,0.0,3.1,8.4,3.5,2.8,2.2],
+  deficit:[-0.9,-0.4,-0.3,0.0,-0.3,1.3,2.4,1.9,-4.5,-11.2,-9.7,-9.6,-10.5,-7.0,-6.0,-5.3,-4.5,-3.1,-2.5,-2.9,-10.1,-6.9,-4.8,-3.7,-3.7,-3.2],
+  paroEU:[8.7,8.5,8.9,9.0,9.2,9.0,8.3,7.2,7.0,9.0,9.7,9.7,10.5,10.9,10.2,9.4,8.6,7.6,6.8,6.7,7.1,7.0,6.2,6.0,5.9,5.7],
+};
+const EVENTS={2008:{l:'Crisis financiera',c:'rgba(229,115,115,0.8)'},2012:{l:'Reforma laboral',c:'rgba(129,199,132,0.8)'},2018:{l:'Cambio gobierno',c:'rgba(200,162,74,0.8)'},2020:{l:'COVID-19',c:'rgba(229,115,115,0.8)'},2022:{l:'Shock energético',c:'rgba(229,115,115,0.8)'},2023:{l:'Elecciones 23J',c:'rgba(100,181,246,0.8)'}};
+const META={deuda:{t:'Deuda pública sobre PIB',s:'ESPAÑA · 2000–2026 · % del PIB · Banco de España / Eurostat',c:'#c0392b'},paro:{t:'Tasa de desempleo (EPA)',s:'ESPAÑA · 2000–2026 · % población activa · INE',c:'#c0392b'},pib:{t:'Crecimiento del PIB real',s:'ESPAÑA · 2000–2026 · Variación anual % · INE',c:'#1e8449'},ipc:{t:'IPC — Inflación general',s:'ESPAÑA · 2000–2026 · Variación interanual % · INE',c:'#ca8a04'},deficit:{t:'Déficit / Superávit público',s:'ESPAÑA · 2000–2026 · % del PIB · IGAE / Eurostat',c:'#2e86c1'}};
+
+Chart.defaults.color='rgba(242,237,227,0.35)';
+Chart.defaults.borderColor='rgba(242,237,227,0.06)';
+Chart.defaults.font.family="'DM Mono',monospace";
+Chart.defaults.font.size=10;
+
+const TT={backgroundColor:'rgba(12,11,9,0.97)',borderColor:'rgba(242,237,227,0.12)',borderWidth:1,titleColor:'rgba(242,237,227,0.45)',bodyColor:'#f2ede3',titleFont:{family:"'DM Mono',monospace",size:9},bodyFont:{family:"'Playfair Display',Georgia,serif",size:16,weight:'700'},padding:10};
+function scalesY(mn,mx,u='%'){return{y:{min:mn,max:mx,grid:{color:'rgba(242,237,227,0.05)'},ticks:{callback:v=>v+u,font:{size:9}},border:{color:'transparent'}},x:{grid:{display:false},ticks:{font:{size:9},maxTicksLimit:9,autoSkip:true},border:{color:'rgba(242,237,227,0.07)'}}};}
+
+let showEv=true,metric='deuda',period=25,mc,pc,ic;
+
+function sliced(data){const s=period===0?0:Math.max(0,YEARS.length-period);return{labels:YEARS.slice(s),data:data.slice(s)};}
+
+function annots(){
+  if(!showEv)return{};
+  const a={};
+  Object.entries(EVENTS).forEach(([yr,ev])=>{
+    const idx=YEARS.indexOf(yr);if(idx<0)return;
+    const {labels}=sliced([]);const si=period===0?0:Math.max(0,YEARS.length-period);const li=idx-si;
+    if(li<0)return;
+    a['e'+yr]={type:'line',xMin:li,xMax:li,borderColor:ev.c,borderWidth:1,borderDash:[3,3],
+      label:{content:ev.l,display:true,position:'start',backgroundColor:'rgba(12,11,9,0.88)',color:'rgba(242,237,227,0.75)',font:{family:"'DM Mono',monospace",size:8},padding:{x:5,y:2},yAdjust:-8}};
+  });
+  return a;
+}
+
+function buildMain(m){
+  metric=m;const meta=META[m];
+  const{labels,data}=sliced(D[m]);
+  const mn=Math.min(...data),mx=Math.max(...data),pad=(mx-mn)*0.15;
+  if(mc)mc.destroy();
+  const ctx=document.getElementById('mainC').getContext('2d');
+  const g=ctx.createLinearGradient(0,0,0,250);g.addColorStop(0,meta.c+'44');g.addColorStop(1,meta.c+'06');
+  mc=new Chart(ctx,{type:'line',data:{labels,datasets:[{label:meta.t,data,borderColor:meta.c,backgroundColor:g,borderWidth:2,tension:0.35,fill:true,pointRadius:2,pointBackgroundColor:meta.c,pointBorderColor:'#0c0b09',pointBorderWidth:1.5,pointHoverRadius:5}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.raw}%`}},annotation:{annotations:annots()}},scales:scalesY(mn-pad,mx+pad)}});
+  document.getElementById('mc-title').textContent=meta.t;
+  document.getElementById('mc-sub').textContent=meta.s;
+}
+
+function toggleEv(){showEv=!showEv;const b=document.getElementById('evBtn');b.classList.toggle('on',showEv);b.textContent=(showEv?'◉ ':'○ ')+'Eventos políticos';document.getElementById('evLeg').style.display=showEv?'flex':'none';buildMain(metric);}
+function showChart(m,el){document.querySelectorAll('.kpi').forEach(k=>k.classList.remove('active'));el.classList.add('active');buildMain(m);}
+function setPeriod(y,el){document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');period=y;buildMain(metric);buildParo();buildIpc();}
+
+function buildParo(){
+  const{labels,data:esp}=sliced(D.paro);const{data:eu}=sliced(D.paroEU);
+  if(pc)pc.destroy();
+  pc=new Chart(document.getElementById('paroC'),{type:'line',data:{labels,datasets:[{label:'España',data:esp,borderColor:'#c0392b',backgroundColor:'rgba(192,57,43,0.08)',borderWidth:2,tension:0.35,fill:true,pointRadius:1.5,pointBackgroundColor:'#c0392b',pointBorderColor:'#0c0b09',pointBorderWidth:1},{label:'UE-27',data:eu,borderColor:'rgba(100,181,246,0.7)',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,3],tension:0.35,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'top',align:'end',labels:{boxWidth:10,boxHeight:2,padding:10,color:'rgba(242,237,227,0.45)',font:{size:9}}},tooltip:{...TT,callbacks:{label:c=>` ${c.dataset.label}: ${c.raw}%`}}},scales:scalesY(0,30)}});
+}
+
+function buildIpc(){
+  const{labels,data}=sliced(D.ipc);
+  if(ic)ic.destroy();
+  const cols=data.map(v=>v>4?'rgba(229,115,115,0.78)':v>2?'rgba(239,159,39,0.78)':'rgba(129,199,132,0.78)');
+  ic=new Chart(document.getElementById('ipcC'),{type:'bar',data:{labels,datasets:[{data,backgroundColor:cols,borderRadius:2,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.raw}%`}}},scales:scalesY(-2,12)}});
+}
+
+function buildGasto(){
+  new Chart(document.getElementById('gastoC'),{type:'bar',data:{labels:['Seg. Social','Deuda','Sanidad','Educación','Defensa','Infraestr.','I+D','Otros'],datasets:[{label:'2022',data:[168,32,36,42,11,15,9,48],backgroundColor:'rgba(242,237,227,0.1)',borderRadius:2,borderWidth:0},{label:'2024',data:[204,37,39,48,13,17,10,53],backgroundColor:'rgba(192,57,43,0.75)',borderRadius:2,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'top',align:'end',labels:{boxWidth:10,boxHeight:8,padding:10,color:'rgba(242,237,227,0.45)',font:{size:9}}},tooltip:{...TT,callbacks:{label:c=>` ${c.dataset.label}: ${c.raw}B€`}}},scales:{y:{grid:{color:'rgba(242,237,227,0.05)'},ticks:{callback:v=>v+'B',font:{size:9}},border:{color:'transparent'}},x:{grid:{display:false},ticks:{font:{size:9},autoSkip:false,maxRotation:28},border:{color:'rgba(242,237,227,0.07)'}}}}});
+}
+
+function spark(id,data,col){
+  const c=document.getElementById(id);if(!c)return;
+  const d=data.slice(-12);
+  new Chart(c,{type:'line',data:{labels:d.map((_,i)=>i),datasets:[{data:d,borderColor:col,borderWidth:1.5,fill:false,tension:0.4,pointRadius:0}]},options:{responsive:false,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{display:false}},animation:false}});
+}
+
+window.addEventListener('load',()=>{
+  buildMain('deuda');buildParo();buildIpc();buildGasto();
+  spark('sp1',D.deuda,'#e57373');
+  spark('sp2',D.paro,'#ffd54f');
+  spark('sp3',D.pib,'#81c784');
+  spark('sp4',D.ipc,'#ffd54f');
+  spark('sp5',D.deficit,'#e57373');
+  spark('sp6',[22000,22800,23100,23500,24000,24800,25100,25600,26200,26800,27200,27840],'#81c784');
+  spark('sp7',[18,19,20,22,21,24,23,25,24,26,26.3,28.4],'#81c784');
+});
+</script>
+
+<section style="background:rgba(192,57,43,0.05);border-top:1px solid rgba(245,240,232,0.08);padding:32px clamp(16px,3vw,52px);display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
+  <div>
+    <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#c0392b;margin-bottom:6px;">Newsletter inteligente</div>
+    <p style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#f5f0e8;margin-bottom:0;">Entérate cuando el gobierno actúa sobre lo que te importa.</p>
+  </div>
+  <a href="democraticai-registro.html" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:#c0392b;color:#f5f0e8;padding:12px 24px;border-radius:3px;text-decoration:none;white-space:nowrap;flex-shrink:0;">Elegir mis temas →</a>
+</section>
+</body>
+</html>

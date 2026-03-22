@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DemocraticAI — Navegación</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:#0f0e0c;color:#f5f0e8;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:.35;pointer-events:none;z-index:0;}
+
+.hub{position:relative;z-index:1;max-width:720px;width:100%;}
+
+.logo{display:flex;align-items:center;gap:12px;margin-bottom:48px;justify-content:center;}
+.logo-mark{width:28px;height:28px;background:#c0392b;border-radius:4px;display:flex;align-items:center;justify-content:center;}
+.logo-mark svg{width:14px;height:14px;}
+.logo-text{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#f5f0e8;}
+.logo-text em{color:#c0392b;font-style:normal;}
+
+.hub-title{font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,42px);font-weight:900;line-height:1.1;letter-spacing:-.02em;text-align:center;margin-bottom:12px;}
+.hub-title em{font-style:italic;color:rgba(245,240,232,.35);}
+.hub-sub{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#6b6560;text-align:center;margin-bottom:48px;}
+
+.pages{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px;}
+
+.page-card{background:rgba(245,240,232,.03);border:1px solid rgba(245,240,232,.08);border-radius:6px;padding:24px;text-decoration:none;transition:all .2s;display:block;position:relative;overflow:hidden;}
+.page-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent,#c0392b);transform:scaleX(0);transition:transform .2s;}
+.page-card:hover{border-color:rgba(245,240,232,.2);background:rgba(245,240,232,.05);}
+.page-card:hover::before{transform:scaleX(1);}
+
+.page-num{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent,#c0392b);margin-bottom:10px;}
+.page-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#f5f0e8;margin-bottom:6px;line-height:1.2;}
+.page-desc{font-size:12px;color:#6b6560;line-height:1.5;margin-bottom:14px;}
+.page-tags{display:flex;flex-wrap:wrap;gap:5px;}
+.tag{font-family:'DM Mono',monospace;font-size:9px;padding:2px 7px;border-radius:2px;background:rgba(245,240,232,.06);color:rgba(245,240,232,.4);letter-spacing:.04em;}
+.page-arrow{position:absolute;top:22px;right:20px;font-family:'DM Mono',monospace;font-size:14px;color:rgba(245,240,232,.2);transition:all .2s;}
+.page-card:hover .page-arrow{color:var(--accent,#c0392b);transform:translateX(3px);}
+
+.status-row{display:flex;align-items:center;gap:6px;margin-top:12px;}
+.status-dot{width:6px;height:6px;border-radius:50%;background:#4caf50;}
+.status-label{font-family:'DM Mono',monospace;font-size:9px;color:#4caf50;letter-spacing:.06em;}
+
+.instructions{background:rgba(245,240,232,.02);border:1px solid rgba(245,240,232,.06);border-radius:6px;padding:20px 24px;}
+.inst-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#6b6560;margin-bottom:14px;}
+.inst-steps{display:flex;flex-direction:column;gap:8px;}
+.inst-step{display:flex;align-items:flex-start;gap:12px;font-size:12px;color:rgba(245,240,232,.55);line-height:1.5;}
+.inst-step-num{font-family:'DM Mono',monospace;font-size:9px;color:#c9a84c;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);padding:1px 6px;border-radius:2px;flex-shrink:0;margin-top:1px;}
+.inst-step a{color:#c9a84c;text-decoration:none;}
+.inst-step a:hover{text-decoration:underline;}
+
+.footer-note{margin-top:24px;font-family:'DM Mono',monospace;font-size:10px;color:rgba(245,240,232,.2);text-align:center;letter-spacing:.04em;}
+
+@media(max-width:560px){.pages{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="hub">
+
+  <div class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 14 14" fill="none"><path d="M7 1L8.8 5.2H13L9.6 7.8L10.9 12L7 9.5L3.1 12L4.4 7.8L1 5.2H5.2L7 1Z" fill="white"/></svg>
+    </div>
+    <div class="logo-text">Democratic<em>AI</em></div>
+  </div>
+
+  <h1 class="hub-title">Prototipo de producto<br><em>— todas las pantallas</em></h1>
+  <p class="hub-sub">4 interfaces construidas · datos de demostración · diseño de producción</p>
+
+  <div class="pages">
+
+    <a href="democraticai.html" class="page-card" style="--accent:#c0392b">
+      <div class="page-num">01 / Landing</div>
+      <div class="page-arrow">→</div>
+      <div class="page-name">Página principal</div>
+      <div class="page-desc">Hero con la pregunta central, ticker en vivo, panel de promesas recientes y KPIs macroeconómicos.</div>
+      <div class="page-tags"><span class="tag">Ticker</span><span class="tag">Promesas</span><span class="tag">KPIs</span><span class="tag">Dashboard</span></div>
+      <div class="status-row"><div class="status-dot"></div><span class="status-label">Construido</span></div>
+    </a>
+
+    <a href="democraticai-promesa-detalle.html" class="page-card" style="--accent:#c9a84c">
+      <div class="page-num">02 / Detalle</div>
+      <div class="page-arrow">→</div>
+      <div class="page-name">Detalle de promesa + IA</div>
+      <div class="page-desc">Cadena de razonamiento completa, evidencias del BOE, historial de estados y panel de disputa pública.</div>
+      <div class="page-tags"><span class="tag">Razonamiento IA</span><span class="tag">BOE</span><span class="tag">Evidencias</span><span class="tag">Auditable</span></div>
+      <div class="status-row"><div class="status-dot"></div><span class="status-label">Construido</span></div>
+    </a>
+
+    <a href="democraticai-economia.html" class="page-card" style="--accent:#378ADD">
+      <div class="page-num">03 / Economía</div>
+      <div class="page-arrow">→</div>
+      <div class="page-name">Dashboard económico</div>
+      <div class="page-desc">Series históricas de deuda, PIB, paro e IPC desde el año 2000. Filtro de rango temporal y contexto europeo.</div>
+      <div class="page-tags"><span class="tag">INE</span><span class="tag">Series históricas</span><span class="tag">UE</span><span class="tag">Interactivo</span></div>
+      <div class="status-row"><div class="status-dot"></div><span class="status-label">Construido</span></div>
+    </a>
+
+    <a href="democraticai-partidos.html" class="page-card" style="--accent:#9C27B0">
+      <div class="page-num">04 / Partidos</div>
+      <div class="page-arrow">→</div>
+      <div class="page-name">Panel comparativo</div>
+      <div class="page-desc">5 partidos cara a cara. Composición del Congreso, cumplimiento por área temática y evolución mensual.</div>
+      <div class="page-tags"><span class="tag">PSOE</span><span class="tag">PP</span><span class="tag">VOX</span><span class="tag">Sumar</span><span class="tag">Cs</span></div>
+      <div class="status-row"><div class="status-dot"></div><span class="status-label">Construido</span></div>
+    </a>
+
+  </div>
+
+  <div class="instructions">
+    <div class="inst-title">Cómo publicar esto en internet hoy mismo</div>
+    <div class="inst-steps">
+      <div class="inst-step">
+        <span class="inst-step-num">01</span>
+        Descarga todos los archivos HTML de esta conversación a una carpeta en tu ordenador.
+      </div>
+      <div class="inst-step">
+        <span class="inst-step-num">02</span>
+        Ve a <a href="https://app.netlify.com/drop" target="_blank">app.netlify.com/drop</a> y arrastra la carpeta entera. Sin registro. Sin comandos.
+      </div>
+      <div class="inst-step">
+        <span class="inst-step-num">03</span>
+        En 30 segundos tienes una URL pública tipo <span style="color:#c9a84c;font-family:monospace">tu-nombre.netlify.app</span> que puedes compartir con cualquiera.
+      </div>
+      <div class="inst-step">
+        <span class="inst-step-num">04</span>
+        Opcional: compra <span style="color:#c9a84c;font-family:monospace">democraticai.es</span> en Dondominio (~10€/año) y apúntalo a Netlify desde el panel de control.
+      </div>
+    </div>
+  </div>
+
+  <p class="footer-note">DemocraticAI · Prototipo de producto · Todos los datos son de demostración · 2026</p>
+
+</div>
+</body>
+</html>
