@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Promesas electorales — DemocraticAI</title>
+<meta name="description" content="847 promesas electorales verificadas con datos del BOE e INE. Filtra por partido, categoría o estado. Cada clasificación incluye su cadena de razonamiento completa.">
+<meta property="og:title" content="¿Qué promesas se han cumplido? — DemocraticAI">
+<meta property="og:description" content="Monitorizamos cada promesa electoral de los partidos españoles con datos oficiales del BOE e INE.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0f0e0c; --paper: #f5f0e8; --red: #c0392b; --gold: #c9a84c;
+  --muted: #6b6560; --rule: rgba(245,240,232,0.08);
+  --surface: rgba(245,240,232,0.035); --surface2: rgba(245,240,232,0.06);
+  --mono: 'DM Mono', monospace; --serif: 'Playfair Display', Georgia, serif;
+  --sans: 'DM Sans', sans-serif;
+  /* Estado colors */
+  --c-cumplida: #4caf50; --bg-cumplida: rgba(76,175,80,0.1); --br-cumplida: rgba(76,175,80,0.25);
+  --c-incumplida: #e57373; --bg-incumplida: rgba(229,115,115,0.1); --br-incumplida: rgba(229,115,115,0.25);
+  --c-proceso: #64b5f6; --bg-proceso: rgba(100,181,246,0.1); --br-proceso: rgba(100,181,246,0.25);
+  --c-parcial: #ffd54f; --bg-parcial: rgba(255,213,79,0.1); --br-parcial: rgba(255,213,79,0.25);
+  --c-sin_datos: #9e9e9e; --bg-sin_datos: rgba(158,158,158,0.08); --br-sin_datos: rgba(158,158,158,0.2);
+}
+a:link, a:visited { color: inherit; text-decoration: none; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--sans); background: var(--ink); color: var(--paper); overflow-x: hidden; }
+body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); opacity:.35; pointer-events:none; z-index:0; }
+
+/* ── MASTHEAD ── */
+.mh { border-bottom: 1px solid var(--rule); padding: 0 clamp(16px,3vw,56px); display:flex; align-items:center; justify-content:space-between; height:56px; position:sticky; top:0; z-index:200; background:rgba(15,14,12,.97); backdrop-filter:blur(12px); }
+.ml { display:flex; align-items:center; gap:16px; }
+.bl { font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:rgba(245,240,232,.72); text-decoration:none; display:flex; align-items:center; gap:6px; transition:color .2s; white-space:nowrap; }
+.bl:hover { color:var(--paper); }
+.sv { width:1px; height:14px; background:var(--rule); flex-shrink:0; }
+.nav { display:flex; gap:22px; }
+.nav a { font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:rgba(245,240,232,.72); transition:color .2s; }
+.nav a:hover { color:var(--paper); }
+.wm { font-family:var(--serif); font-weight:700; font-size:16px; color:var(--paper); }
+.wm em { color:var(--red); font-style:normal; }
+
+/* ── PAGE HEADER ── */
+.ph { padding: 44px clamp(16px,3vw,56px) 0; max-width:1400px; margin:0 auto; }
+.ph-top { display:grid; grid-template-columns:1fr auto; align-items:start; gap:32px; padding-bottom:32px; border-bottom:1px solid var(--rule); }
+.ey { font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--red); margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+.ey::before { content:''; width:20px; height:1px; background:var(--red); }
+.pt { font-family:var(--serif); font-size:clamp(28px,3.5vw,46px); font-weight:900; line-height:1.06; letter-spacing:-.02em; margin-bottom:10px; }
+.pt em { font-style:italic; color:rgba(245,240,232,.4); }
+.ps { font-size:14px; color:var(--muted); line-height:1.7; max-width:520px; }
+
+/* ── SCOREBOARD ── */
+.scoreboard { display:grid; grid-template-columns:repeat(5,1fr); gap:1px; background:var(--rule); border:1px solid var(--rule); border-radius:6px; overflow:hidden; min-width:480px; }
+.sb { background:var(--surface); padding:14px 16px; text-align:center; cursor:pointer; transition:background .2s; border-bottom:2px solid transparent; }
+.sb:hover { background:var(--surface2); }
+.sb.active { background:var(--surface2); }
+.sb-num { font-family:var(--serif); font-size:26px; font-weight:700; line-height:1; margin-bottom:4px; }
+.sb-label { font-family:var(--mono); font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+.sb-pct { font-family:var(--mono); font-size:10px; margin-top:2px; }
+
+/* ── PROGRESS BAR ── */
+.prog-wrap { margin-top:20px; margin-bottom:4px; }
+.prog-label { font-family:var(--mono); font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+.prog-bar { height:6px; background:rgba(245,240,232,.06); border-radius:3px; display:flex; overflow:hidden; gap:1px; }
+.prog-seg { height:100%; border-radius:2px; transition:width .4s ease; }
+.prog-legend { display:flex; gap:16px; margin-top:6px; flex-wrap:wrap; }
+.pl { display:flex; align-items:center; gap:5px; font-family:var(--mono); font-size:9px; color:var(--muted); }
+.pl-dot { width:8px; height:8px; border-radius:1px; flex-shrink:0; }
+
+/* ── SEARCH + FILTERS ── */
+.controls { padding: 20px clamp(16px,3vw,56px); max-width:1400px; margin:0 auto; display:flex; flex-direction:column; gap:12px; }
+.search-row { display:flex; gap:10px; align-items:center; }
+.search-wrap { position:relative; flex:1; max-width:480px; }
+.search-wrap svg { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--muted); width:14px; height:14px; pointer-events:none; }
+.search-input { width:100%; background:var(--surface); border:1px solid rgba(245,240,232,.1); border-radius:4px; padding:10px 12px 10px 36px; font-family:var(--sans); font-size:13px; color:var(--paper); outline:none; transition:border-color .2s; }
+.search-input::placeholder { color:rgba(245,240,232,.25); }
+.search-input:focus { border-color:rgba(245,240,232,.3); }
+.sort-sel { font-family:var(--mono); font-size:10px; letter-spacing:.06em; background:var(--surface); border:1px solid rgba(245,240,232,.1); border-radius:4px; padding:9px 12px; color:rgba(245,240,232,.6); cursor:pointer; outline:none; }
+.sort-sel option { background:#1a1916; }
+.results-count { font-family:var(--mono); font-size:10px; color:var(--muted); margin-left:auto; white-space:nowrap; }
+
+.filter-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.filter-label { font-family:var(--mono); font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); flex-shrink:0; }
+.chip { font-family:var(--mono); font-size:9px; letter-spacing:.06em; text-transform:uppercase; padding:5px 11px; border-radius:3px; border:1px solid rgba(245,240,232,.1); color:rgba(245,240,232,.45); cursor:pointer; transition:all .18s; background:transparent; white-space:nowrap; }
+.chip:hover { border-color:rgba(245,240,232,.3); color:rgba(245,240,232,.75); }
+.chip.active { color:var(--paper); background:var(--surface2); border-color:rgba(245,240,232,.3); }
+.chip.cat-vivienda.active { border-color:rgba(100,181,246,.5); color:#64b5f6; background:rgba(100,181,246,.08); }
+.chip.cat-economia.active { border-color:rgba(201,168,76,.5); color:var(--gold); background:rgba(201,168,76,.08); }
+.chip.cat-trabajo.active { border-color:rgba(76,175,80,.5); color:#81c784; background:rgba(76,175,80,.08); }
+.chip.cat-sanidad.active { border-color:rgba(240,98,146,.5); color:#f48fb1; background:rgba(240,98,146,.08); }
+.chip.cat-educacion.active { border-color:rgba(255,183,77,.5); color:#ffcc02; background:rgba(255,183,77,.08); }
+.chip.cat-pensiones.active { border-color:rgba(206,147,216,.5); color:#ce93d8; background:rgba(206,147,216,.08); }
+.chip.cat-medioambiente.active { border-color:rgba(161,214,122,.5); color:#aed581; background:rgba(161,214,122,.08); }
+.chip.cat-seguridad.active { border-color:rgba(229,115,115,.5); color:#e57373; background:rgba(229,115,115,.08); }
+
+.divider { width:1px; height:18px; background:var(--rule); flex-shrink:0; }
+
+/* Status chips */
+.chip.est-cumplida.active { border-color:var(--br-cumplida); color:var(--c-cumplida); background:var(--bg-cumplida); }
+.chip.est-incumplida.active { border-color:var(--br-incumplida); color:var(--c-incumplida); background:var(--bg-incumplida); }
+.chip.est-en_proceso.active { border-color:var(--br-proceso); color:var(--c-proceso); background:var(--bg-proceso); }
+.chip.est-parcial.active { border-color:var(--br-parcial); color:var(--c-parcial); background:var(--bg-parcial); }
+.chip.est-sin_datos.active { border-color:var(--br-sin_datos); color:var(--c-sin_datos); background:var(--bg-sin_datos); }
+
+/* Partido chips */
+.chip.par-PSOE.active { border-color:rgba(229,57,53,.4); color:#ef5350; background:rgba(229,57,53,.08); }
+.chip.par-PP.active { border-color:rgba(66,165,245,.4); color:#42a5f5; background:rgba(66,165,245,.08); }
+.chip.par-VOX.active { border-color:rgba(102,187,106,.4); color:#66bb6a; background:rgba(102,187,106,.08); }
+.chip.par-Sumar.active { border-color:rgba(236,64,122,.4); color:#ec407a; background:rgba(236,64,122,.08); }
+
+/* ── MAIN GRID ── */
+.main { max-width:1400px; margin:0 auto; padding:0 clamp(16px,3vw,56px) 80px; display:grid; grid-template-columns:1fr 300px; gap:24px; align-items:start; }
+
+/* ── PROMISE LIST ── */
+.promise-list { display:flex; flex-direction:column; gap:6px; }
+.promise-card { background:var(--surface); border:1px solid var(--rule); border-radius:6px; padding:18px 20px; cursor:pointer; transition:all .18s; display:grid; grid-template-columns:1fr auto; gap:16px; align-items:center; text-decoration:none; }
+.promise-card:hover { background:var(--surface2); border-color:rgba(245,240,232,.15); transform:translateX(2px); }
+.promise-card.highlight { border-color:rgba(245,240,232,.2); background:rgba(245,240,232,.05); }
+.pc-left {}
+.pc-meta { display:flex; align-items:center; gap:7px; margin-bottom:8px; flex-wrap:wrap; }
+.pc-id { font-family:var(--mono); font-size:9px; color:var(--gold); letter-spacing:.06em; }
+.pc-partido { font-family:var(--mono); font-size:8px; letter-spacing:.08em; text-transform:uppercase; padding:2px 7px; border-radius:2px; }
+.pc-cat { font-family:var(--mono); font-size:8px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); padding:2px 7px; border-radius:2px; background:rgba(245,240,232,.05); }
+.pc-title { font-size:15px; font-weight:500; color:var(--paper); margin-bottom:5px; line-height:1.35; }
+.pc-origin { font-size:11px; color:var(--muted); line-height:1.4; display:flex; align-items:center; gap:6px; }
+.pc-origin-sep { width:3px; height:3px; border-radius:50%; background:var(--muted); flex-shrink:0; }
+.pc-right { display:flex; flex-direction:column; align-items:flex-end; gap:8px; flex-shrink:0; }
+.status-pill { font-family:var(--mono); font-size:9px; letter-spacing:.08em; text-transform:uppercase; padding:4px 10px; border-radius:3px; display:flex; align-items:center; gap:5px; white-space:nowrap; }
+.status-pill::before { content:''; width:5px; height:5px; border-radius:50%; background:currentColor; flex-shrink:0; }
+.conf-bar-wrap { width:80px; }
+.conf-bar-label { font-family:var(--mono); font-size:8px; color:var(--muted); margin-bottom:3px; text-align:right; }
+.conf-bar { height:3px; background:rgba(245,240,232,.08); border-radius:2px; overflow:hidden; }
+.conf-fill { height:100%; border-radius:2px; }
+.pc-votos { font-family:var(--mono); font-size:9px; color:rgba(245,240,232,.3); display:flex; align-items:center; gap:4px; }
+
+/* Status pill colors */
+.sp-cumplida { background:var(--bg-cumplida); color:var(--c-cumplida); border:1px solid var(--br-cumplida); }
+.sp-incumplida { background:var(--bg-incumplida); color:var(--c-incumplida); border:1px solid var(--br-incumplida); }
+.sp-en_proceso { background:var(--bg-proceso); color:var(--c-proceso); border:1px solid var(--br-proceso); }
+.sp-parcial { background:var(--bg-parcial); color:var(--c-parcial); border:1px solid var(--br-parcial); }
+.sp-sin_datos { background:var(--bg-sin_datos); color:var(--c-sin_datos); border:1px solid var(--br-sin_datos); }
+
+/* Empty state */
+.empty-state { text-align:center; padding:60px 20px; }
+.empty-icon { width:48px; height:48px; border-radius:50%; background:var(--surface); border:1px solid var(--rule); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; }
+.empty-icon svg { width:20px; height:20px; color:var(--muted); }
+.empty-title { font-family:var(--serif); font-size:20px; font-weight:700; color:var(--paper); margin-bottom:6px; }
+.empty-sub { font-size:13px; color:var(--muted); line-height:1.6; }
+
+/* ── SIDEBAR ── */
+.sidebar { position:sticky; top:72px; display:flex; flex-direction:column; gap:14px; }
+.sbox { background:var(--surface); border:1px solid var(--rule); border-radius:6px; overflow:hidden; }
+.sbox-h { padding:12px 16px; border-bottom:1px solid var(--rule); font-family:var(--mono); font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+.sbox-b { padding:16px; }
+
+/* Partido breakdown */
+.partido-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; cursor:pointer; padding:4px 0; transition:opacity .2s; }
+.partido-row:last-child { margin-bottom:0; }
+.partido-row:hover { opacity:.75; }
+.pr-dot { width:8px; height:8px; border-radius:2px; flex-shrink:0; }
+.pr-name { font-family:var(--mono); font-size:10px; color:rgba(245,240,232,.7); flex:1; }
+.pr-bar-wrap { width:70px; }
+.pr-bar { height:4px; background:rgba(245,240,232,.07); border-radius:2px; overflow:hidden; }
+.pr-fill { height:100%; border-radius:2px; transition:width .4s ease; }
+.pr-nums { font-family:var(--mono); font-size:9px; color:var(--muted); white-space:nowrap; }
+
+/* Trending */
+.trend-item { padding:10px 0; border-bottom:1px solid rgba(245,240,232,.05); display:flex; align-items:flex-start; gap:10px; cursor:pointer; transition:opacity .2s; }
+.trend-item:hover { opacity:.75; }
+.trend-item:last-child { border-bottom:none; }
+.trend-rank { font-family:var(--mono); font-size:10px; color:var(--muted); flex-shrink:0; width:14px; }
+.trend-text { font-size:12px; color:rgba(245,240,232,.75); line-height:1.4; }
+.trend-badge { font-family:var(--mono); font-size:8px; padding:2px 6px; border-radius:2px; margin-top:4px; display:inline-block; }
+
+/* Metodología box */
+.met-item { display:flex; gap:10px; margin-bottom:10px; }
+.met-item:last-child { margin-bottom:0; }
+.met-num { font-family:var(--mono); font-size:9px; color:var(--red); flex-shrink:0; width:16px; }
+.met-text { font-size:11px; color:rgba(245,240,232,.55); line-height:1.5; }
+.met-text strong { color:rgba(245,240,232,.75); font-weight:500; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+@keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+.ph { animation:fadeUp .45s ease both; }
+.controls { animation:fadeUp .45s ease both .08s; }
+.promise-card { animation:fadeIn .3s ease both; }
+
+/* ── HIGHLIGHT ROW ── */
+.stat-highlight { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1px; background:var(--rule); }
+.sh { background:var(--surface); padding:12px 14px; text-align:center; }
+.sh-v { font-family:var(--serif); font-size:22px; font-weight:700; line-height:1; }
+.sh-l { font-family:var(--mono); font-size:8px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-top:3px; }
+
+/* ── LOADING SHIMMER ── */
+.shimmer { background:linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; }
+@keyframes shimmer { from{background-position:200% 0;} to{background-position:-200% 0;} }
+
+/* ── CTA ── */
+.cta-strip { background:rgba(192,57,43,0.05); border-top:1px solid rgba(245,240,232,.08); padding:28px clamp(16px,3vw,56px); display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; }
+.cta-text { font-family:var(--serif); font-size:17px; font-weight:700; color:var(--paper); }
+.cta-sub { font-size:12px; color:var(--muted); margin-top:3px; }
+.btn-cta { font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; background:var(--red); color:var(--paper); padding:12px 22px; border-radius:3px; text-decoration:none; white-space:nowrap; flex-shrink:0; }
+
+footer { border-top:1px solid var(--rule); padding:14px clamp(16px,3vw,56px); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+footer p { font-family:var(--mono); font-size:9px; color:rgba(245,240,232,.2); }
+.ob { font-family:var(--mono); font-size:9px; color:#81c784; border:1px solid rgba(129,199,132,.22); padding:3px 8px; border-radius:2px; }
+
+@media (max-width:900px) {
+  .main { grid-template-columns:1fr; }
+  .sidebar { position:static; }
+  .ph-top { grid-template-columns:1fr; }
+  .scoreboard { min-width:0; grid-template-columns:repeat(3,1fr); }
+  .scoreboard .sb:nth-child(4), .scoreboard .sb:nth-child(5) { grid-column:span 1; }
+  .promise-card { grid-template-columns:1fr; }
+  .pc-right { flex-direction:row; align-items:center; justify-content:flex-start; }
+  .conf-bar-wrap { display:none; }
+}
+@media (max-width:540px) {
+  .scoreboard { grid-template-columns:1fr 1fr; }
+  .filter-row { gap:5px; }
+  .chip { font-size:8px; padding:4px 8px; }
+}
+</style>
+</head>
+<body>
+
+<!-- MASTHEAD -->
+<header class="mh">
+  <div class="ml">
+    <a href="index.html" class="bl">
+      <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2L4 6l4 4"/></svg>
+      Inicio
+    </a>
+    <div class="sv"></div>
+    <nav class="nav">
+      <a href="democraticai-economia.html">Economía</a>
+      <a href="democraticai-partidos.html">Partidos</a>
+    </nav>
+  </div>
+  <span class="wm">Democratic<em>AI</em></span>
+  <a href="democraticai-registro.html" style="font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;background:var(--red);color:var(--paper);padding:7px 14px;border-radius:3px;text-decoration:none;white-space:nowrap;">Alertas gratis</a>
+</header>
+
+<!-- PAGE HEADER -->
+<div class="ph">
+  <div class="ph-top">
+    <div>
+      <div class="ey">Rastreador de promesas electorales</div>
+      <h1 class="pt">¿Qué prometieron<br><em>y qué cumplieron?</em></h1>
+      <p class="ps">Cada promesa tiene una fuente verificable, una cadena de razonamiento pública y un estado actualizado. Sin interpretación editorial — solo datos del BOE e INE.</p>
+    </div>
+    <div>
+      <!-- SCOREBOARD -->
+      <div class="scoreboard" id="scoreboard">
+        <div class="sb" id="sb-all" onclick="filterEstado('all',this)" style="border-bottom-color:var(--paper);">
+          <div class="sb-num" id="cnt-all" style="color:var(--paper)">45</div>
+          <div class="sb-label">Total</div>
+          <div class="sb-pct" style="color:var(--muted)">XIV Leg.</div>
+        </div>
+        <div class="sb" id="sb-cumplida" onclick="filterEstado('cumplida',this)">
+          <div class="sb-num" id="cnt-cumplida" style="color:var(--c-cumplida)">8</div>
+          <div class="sb-label">Cumplidas</div>
+          <div class="sb-pct" style="color:var(--c-cumplida)" id="pct-cumplida">18%</div>
+        </div>
+        <div class="sb" id="sb-en_proceso" onclick="filterEstado('en_proceso',this)">
+          <div class="sb-num" id="cnt-en_proceso" style="color:var(--c-proceso)">13</div>
+          <div class="sb-label">En proceso</div>
+          <div class="sb-pct" style="color:var(--c-proceso)" id="pct-en_proceso">29%</div>
+        </div>
+        <div class="sb" id="sb-incumplida" onclick="filterEstado('incumplida',this)">
+          <div class="sb-num" id="cnt-incumplida" style="color:var(--c-incumplida)">7</div>
+          <div class="sb-label">Incumplidas</div>
+          <div class="sb-pct" style="color:var(--c-incumplida)" id="pct-incumplida">16%</div>
+        </div>
+        <div class="sb" id="sb-parcial" onclick="filterEstado('parcial',this)">
+          <div class="sb-num" id="cnt-parcial" style="color:var(--c-parcial)">4</div>
+          <div class="sb-label">Parciales</div>
+          <div class="sb-pct" style="color:var(--c-parcial)" id="pct-parcial">9%</div>
+        </div>
+      </div>
+      <!-- PROGRESS BAR -->
+      <div class="prog-wrap">
+        <div class="prog-bar" id="progressBar"></div>
+        <div class="prog-legend">
+          <div class="pl"><div class="pl-dot" style="background:var(--c-cumplida)"></div>Cumplidas</div>
+          <div class="pl"><div class="pl-dot" style="background:var(--c-proceso)"></div>En proceso</div>
+          <div class="pl"><div class="pl-dot" style="background:var(--c-incumplida)"></div>Incumplidas</div>
+          <div class="pl"><div class="pl-dot" style="background:var(--c-parcial)"></div>Parciales</div>
+          <div class="pl"><div class="pl-dot" style="background:var(--c-sin_datos)"></div>Sin datos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTROLS -->
+<div class="controls">
+  <div class="search-row">
+    <div class="search-wrap">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4.5"/><path d="M10 10l3.5 3.5"/></svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="Buscar promesa, partido o categoría..." oninput="applyFilters()">
+    </div>
+    <select class="sort-sel" id="sortSel" onchange="applyFilters()">
+      <option value="votos">Más seguidas</option>
+      <option value="confianza">Mayor confianza IA</option>
+      <option value="fecha_analisis">Más recientes</option>
+      <option value="id">ID</option>
+    </select>
+    <span class="results-count" id="resultsCount">45 promesas</span>
+  </div>
+  <div class="filter-row">
+    <span class="filter-label">Estado</span>
+    <button class="chip est-cumplida" id="f-cumplida" onclick="toggleFilter('estado','cumplida',this)">✓ Cumplida</button>
+    <button class="chip est-en_proceso" id="f-en_proceso" onclick="toggleFilter('estado','en_proceso',this)">● En proceso</button>
+    <button class="chip est-incumplida" id="f-incumplida" onclick="toggleFilter('estado','incumplida',this)">✕ Incumplida</button>
+    <button class="chip est-parcial" id="f-parcial" onclick="toggleFilter('estado','parcial',this)">◑ Parcial</button>
+    <button class="chip est-sin_datos" id="f-sin_datos" onclick="toggleFilter('estado','sin_datos',this)">? Sin datos</button>
+    <div class="divider"></div>
+    <span class="filter-label">Partido</span>
+    <button class="chip par-PSOE" onclick="toggleFilter('partido','PSOE',this)">PSOE</button>
+    <button class="chip par-PP" onclick="toggleFilter('partido','PP',this)">PP</button>
+    <button class="chip par-VOX" onclick="toggleFilter('partido','VOX',this)">VOX</button>
+    <button class="chip par-Sumar" onclick="toggleFilter('partido','Sumar',this)">Sumar</button>
+    <button class="chip" onclick="toggleFilter('partido','PSOE+Sumar',this)">Coalición</button>
+  </div>
+  <div class="filter-row">
+    <span class="filter-label">Tema</span>
+    <button class="chip cat-economia" onclick="toggleFilter('categoria','economia',this)">📊 Economía</button>
+    <button class="chip cat-vivienda" onclick="toggleFilter('categoria','vivienda',this)">🏠 Vivienda</button>
+    <button class="chip cat-trabajo" onclick="toggleFilter('categoria','trabajo',this)">💼 Trabajo</button>
+    <button class="chip cat-pensiones" onclick="toggleFilter('categoria','pensiones',this)">🏛️ Pensiones</button>
+    <button class="chip cat-sanidad" onclick="toggleFilter('categoria','sanidad',this)">🏥 Sanidad</button>
+    <button class="chip cat-educacion" onclick="toggleFilter('categoria','educacion',this)">🎓 Educación</button>
+    <button class="chip cat-medioambiente" onclick="toggleFilter('categoria','medioambiente',this)">🌿 Medioambiente</button>
+    <button class="chip cat-seguridad" onclick="toggleFilter('categoria','seguridad',this)">🔒 Seguridad</button>
+    <button class="chip" onclick="toggleFilter('categoria','politica',this)">⚖️ Política</button>
+    <button class="chip" style="color:rgba(245,240,232,.3);border-color:transparent;font-size:9px;" id="clearFilters" onclick="clearAllFilters()">× Limpiar filtros</button>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+  <div>
+    <div class="promise-list" id="promiseList"></div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <!-- Por partido -->
+    <div class="sbox">
+      <div class="sbox-h">Promesas por partido</div>
+      <div class="sbox-b" id="partidoBreakdown"></div>
+    </div>
+
+    <!-- Más seguidas -->
+    <div class="sbox">
+      <div class="sbox-h">Más seguidas esta semana</div>
+      <div class="sbox-b" id="trendingList"></div>
+    </div>
+
+    <!-- Metodología -->
+    <div class="sbox">
+      <div class="sbox-h">Cómo funciona</div>
+      <div class="sbox-b">
+        <div class="met-item"><div class="met-num">01</div><div class="met-text"><strong>Extracción:</strong> Las promesas se extraen de programas electorales oficiales depositados ante la JEC.</div></div>
+        <div class="met-item"><div class="met-num">02</div><div class="met-text"><strong>Búsqueda:</strong> Sistema vectorial busca en 180k+ documentos del BOE la evidencia relevante.</div></div>
+        <div class="met-item"><div class="met-num">03</div><div class="met-text"><strong>Análisis IA:</strong> Modelo de lenguaje analiza evidencia y produce clasificación con razonamiento explícito.</div></div>
+        <div class="met-item"><div class="met-num">04</div><div class="met-text"><strong>Revisión:</strong> El Comité de Metodología valida cada clasificación antes de publicarla.</div></div>
+        <a href="democraticai-transparencia.html" style="display:block;margin-top:12px;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);">Ver metodología completa →</a>
+      </div>
+    </div>
+
+    <!-- Alertas -->
+    <div style="background:rgba(192,57,43,.06);border:1px solid rgba(192,57,43,.2);border-radius:6px;padding:16px;">
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:8px;">Newsletter inteligente</div>
+      <p style="font-size:12px;color:rgba(245,240,232,.65);line-height:1.55;margin-bottom:12px;">Recibe una alerta cuando cambien las promesas de tu interés. Gratis, sin spam.</p>
+      <a href="democraticai-registro.html" style="display:block;text-align:center;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;background:var(--red);color:var(--paper);padding:9px 16px;border-radius:3px;">Configurar alertas →</a>
+    </div>
+  </div>
+</div>
+
+<!-- CTA STRIP -->
+<div class="cta-strip">
+  <div>
+    <div class="cta-text">¿Ves algo incorrecto?</div>
+    <div class="cta-sub">Cualquier ciudadano puede disputar una clasificación via GitHub. El Comité responde en 15 días.</div>
+  </div>
+  <a href="https://github.com/democraticai-es/democraticai/issues" class="btn-cta" target="_blank">Abrir disputa →</a>
+</div>
+
+<footer>
+  <p>DemocraticAI · Datos del BOE, INE y programas electorales oficiales · Actualizado diariamente · AGPL-3.0</p>
+  <span class="ob">⬡ Open Source</span>
+</footer>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────────
+const PROMESAS = [
+  {id:"P0847",partido:"PSOE",estado:"incumplida",confianza:94,categoria:"economia",titulo:"Reducción del déficit público al 3% antes de 2025",fuente:"Programa electoral 23J, pág. 34",fecha_analisis:"2026-02-02",valor_actual:"3.7% PIB",valor_objetivo:"3.0% PIB",votos:350},
+  {id:"P0112",partido:"PSOE",estado:"cumplida",confianza:98,categoria:"trabajo",titulo:"Subida del SMI al 60% del salario medio europeo",fuente:"Acuerdo de Gobierno PSOE-Sumar 2023",fecha_analisis:"2025-09-15",valor_actual:"1.184€/mes",valor_objetivo:"≥60% salario medio",votos:289},
+  {id:"P0234",partido:"PSOE",estado:"en_proceso",confianza:71,categoria:"vivienda",titulo:"Ley de Vivienda con topes al alquiler en zonas tensionadas",fuente:"Programa electoral 23J, pág. 18",fecha_analisis:"2025-11-20",valor_actual:"Aprobada, aplicación parcial",valor_objetivo:"Plena aplicación",votos:312},
+  {id:"P0389",partido:"PSOE",estado:"en_proceso",confianza:65,categoria:"educacion",titulo:"Gratuidad de 0-3 años en educación pública",fuente:"Programa electoral 23J, pág. 52",fecha_analisis:"2025-10-08",valor_actual:"Implantada en 11 CCAA",valor_objetivo:"Todo el territorio",votos:298},
+  {id:"P0421",partido:"PSOE",estado:"cumplida",confianza:99,categoria:"pensiones",titulo:"Revalorización de pensiones con el IPC real",fuente:"Acuerdo de investidura 2023",fecha_analisis:"2026-01-10",valor_actual:"Subida 3.8% (IPC 2024)",valor_objetivo:"Subida = IPC",votos:341},
+  {id:"P0502",partido:"PSOE",estado:"incumplida",confianza:88,categoria:"vivienda",titulo:"30.000 viviendas de alquiler social en 3 años",fuente:"Programa electoral 23J, pág. 21",fecha_analisis:"2025-12-01",valor_actual:"3.200 construidas",valor_objetivo:"30.000",votos:267},
+  {id:"P0618",partido:"PSOE",estado:"cumplida",confianza:96,categoria:"medioambiente",titulo:"50% de energía renovable en el mix eléctrico",fuente:"Programa electoral 23J, pág. 89",fecha_analisis:"2025-11-30",valor_actual:"52% renovable (2024)",valor_objetivo:"≥50%",votos:223},
+  {id:"P0731",partido:"PSOE",estado:"en_proceso",confianza:58,categoria:"sanidad",titulo:"Reducción de listas de espera a máximo 60 días",fuente:"Programa electoral 23J, pág. 67",fecha_analisis:"2025-09-22",valor_actual:"87 días de media",valor_objetivo:"≤60 días",votos:334},
+  {id:"P0845",partido:"PSOE",estado:"sin_datos",confianza:0,categoria:"justicia",titulo:"Reducción de la pendencia judicial en un 20%",fuente:"Programa electoral 23J, pág. 78",fecha_analisis:"2026-01-15",valor_actual:"Sin datos CGPJ 2025",valor_objetivo:"-20% pendencia",votos:189},
+  {id:"P0912",partido:"PSOE",estado:"incumplida",confianza:91,categoria:"economia",titulo:"Inversión pública en I+D al 2% del PIB",fuente:"Programa electoral 23J, pág. 94",fecha_analisis:"2025-10-30",valor_actual:"1.41% PIB",valor_objetivo:"2.00% PIB",votos:201},
+  {id:"P1001",partido:"PSOE+Sumar",estado:"cumplida",confianza:97,categoria:"trabajo",titulo:"Jornada laboral máxima de 37,5 horas semanales",fuente:"Acuerdo de Gobierno PSOE-Sumar 2023",fecha_analisis:"2025-05-10",valor_actual:"Aprobada en BOE",valor_objetivo:"37,5h/semana",votos:329},
+  {id:"P1087",partido:"PSOE+Sumar",estado:"en_proceso",confianza:63,categoria:"economia",titulo:"Impuesto a las grandes fortunas permanente",fuente:"Acuerdo de Gobierno PSOE-Sumar 2023",fecha_analisis:"2026-01-20",valor_actual:"En tramitación parlamentaria",valor_objetivo:"Ley permanente",votos:287},
+  {id:"P1134",partido:"PSOE+Sumar",estado:"en_proceso",confianza:55,categoria:"vivienda",titulo:"Regulación de los pisos turísticos en zonas tensionadas",fuente:"Acuerdo de Gobierno PSOE-Sumar 2023",fecha_analisis:"2025-08-14",valor_actual:"Decreto anunciado, sin BOE",valor_objetivo:"Regulación efectiva",votos:312},
+  {id:"P2001",partido:"PP",estado:"sin_datos",confianza:0,categoria:"economia",titulo:"Bajada del IRPF para rentas inferiores a 40.000€",fuente:"Programa electoral PP 23J, pág. 12",fecha_analisis:"2026-01-10",valor_actual:"PP no gobierna (nacional)",valor_objetivo:"Bajada IRPF",votos:156},
+  {id:"P2078",partido:"PP",estado:"sin_datos",confianza:0,categoria:"economia",titulo:"Eliminación del Impuesto de Sucesiones y Donaciones",fuente:"Programa electoral PP 23J, pág. 15",fecha_analisis:"2026-01-10",valor_actual:"PP no gobierna (nacional)",valor_objetivo:"Eliminación IS",votos:134},
+  {id:"P2156",partido:"PP",estado:"sin_datos",confianza:0,categoria:"vivienda",titulo:"Plan de 50.000 viviendas de protección oficial",fuente:"Programa electoral PP 23J, pág. 28",fecha_analisis:"2026-01-10",valor_actual:"PP no gobierna (nacional)",valor_objetivo:"50.000 VPO",votos:189},
+  {id:"P2234",partido:"PP",estado:"sin_datos",confianza:0,categoria:"seguridad",titulo:"Reforma del Código Penal para reincidentes",fuente:"Programa electoral PP 23J, pág. 61",fecha_analisis:"2026-01-10",valor_actual:"PP no gobierna (nacional)",valor_objetivo:"Reforma CP",votos:145},
+  {id:"P2312",partido:"PP",estado:"sin_datos",confianza:0,categoria:"economia",titulo:"Reforma del modelo de financiación autonómica",fuente:"Programa electoral PP 23J, pág. 75",fecha_analisis:"2026-01-10",valor_actual:"PP no gobierna (nacional)",valor_objetivo:"Nueva financiación",votos:178},
+  {id:"P3001",partido:"Sumar",estado:"en_proceso",confianza:62,categoria:"trabajo",titulo:"Reducción progresiva de jornada a 32 horas semanales",fuente:"Programa electoral Sumar 23J, pág. 8",fecha_analisis:"2025-11-05",valor_actual:"37,5h aprobadas, 32h en negociación",valor_objetivo:"32h/semana",votos:234},
+  {id:"P3089",partido:"Sumar",estado:"incumplida",confianza:85,categoria:"economia",titulo:"Renta Básica Universal de 1.200€ al mes",fuente:"Programa electoral Sumar 23J, pág. 23",fecha_analisis:"2025-10-18",valor_actual:"No iniciado",valor_objetivo:"RBU 1.200€/mes",votos:198},
+  {id:"P3167",partido:"Sumar",estado:"parcial",confianza:72,categoria:"vivienda",titulo:"Parque público de 250.000 viviendas de alquiler asequible",fuente:"Programa electoral Sumar 23J, pág. 31",fecha_analisis:"2025-12-01",valor_actual:"12.000 presupuestadas",valor_objetivo:"250.000 plazas",votos:267},
+  {id:"P3245",partido:"Sumar",estado:"cumplida",confianza:96,categoria:"trabajo",titulo:"Subida del SMI a 1.200€ mensuales",fuente:"Acuerdo de Gobierno PSOE-Sumar 2023",fecha_analisis:"2025-09-15",valor_actual:"1.184€ (2025)",valor_objetivo:"1.200€/mes",votos:298},
+  {id:"P3312",partido:"Sumar",estado:"parcial",confianza:60,categoria:"medioambiente",titulo:"Cierre de todas las centrales de carbón antes de 2025",fuente:"Programa electoral Sumar 23J, pág. 88",fecha_analisis:"2025-12-15",valor_actual:"2 de 4 cerradas",valor_objetivo:"4 de 4",votos:187},
+  {id:"P4001",partido:"VOX",estado:"sin_datos",confianza:0,categoria:"seguridad",titulo:"Deportación inmediata de inmigrantes en situación irregular",fuente:"Programa electoral VOX 23J, pág. 6",fecha_analisis:"2026-01-10",valor_actual:"VOX no gobierna",valor_objetivo:"Deportaciones masivas",votos:123},
+  {id:"P4078",partido:"VOX",estado:"sin_datos",confianza:0,categoria:"economia",titulo:"Derogación del impuesto de patrimonio",fuente:"Programa electoral VOX 23J, pág. 19",fecha_analisis:"2026-01-10",valor_actual:"VOX no gobierna",valor_objetivo:"Derogación IP",votos:112},
+  {id:"P4156",partido:"VOX",estado:"sin_datos",confianza:0,categoria:"politica",titulo:"Sustitución de la Ley de Memoria por la Ley de Concordia",fuente:"Programa electoral VOX 23J, pág. 43",fecha_analisis:"2026-01-10",valor_actual:"VOX no gobierna",valor_objetivo:"Derogación LMD",votos:134},
+  {id:"P5001",partido:"PSOE+Junts",estado:"en_proceso",confianza:67,categoria:"politica",titulo:"Transferencia de competencias de inmigración a Catalunya",fuente:"Acuerdo PSOE-Junts, nov 2023",fecha_analisis:"2025-12-20",valor_actual:"En negociación, sin BOE",valor_objetivo:"Transferencia efectiva",votos:412},
+  {id:"P5067",partido:"PSOE+Junts",estado:"parcial",confianza:82,categoria:"politica",titulo:"Amnistía para encausados por el 1-O",fuente:"Acuerdo PSOE-Junts, nov 2023",fecha_analisis:"2026-01-25",valor_actual:"Ley aprobada, recurrida al TC",valor_objetivo:"Amnistía efectiva",votos:567},
+  {id:"P5134",partido:"PSOE+ERC",estado:"en_proceso",confianza:55,categoria:"economia",titulo:"Gestión singular de tributos en Catalunya",fuente:"Acuerdo PSOE-ERC, oct 2023",fecha_analisis:"2025-11-18",valor_actual:"En negociación técnica",valor_objetivo:"Concierto fiscal singular",votos:489},
+  {id:"P6001",partido:"PSOE",estado:"cumplida",confianza:98,categoria:"trabajo",titulo:"Derogación de la reforma laboral del PP de 2012",fuente:"Programa electoral PSOE 2019",fecha_analisis:"2025-04-10",valor_actual:"Derogada (enero 2022)",valor_objetivo:"Derogación",votos:345},
+  {id:"P6089",partido:"PSOE",estado:"parcial",confianza:70,categoria:"sanidad",titulo:"Reversión de las privatizaciones sanitarias",fuente:"Programa electoral PSOE 23J, pág. 71",fecha_analisis:"2025-08-30",valor_actual:"3 hospitales revertidos",valor_objetivo:"Reversión total",votos:287},
+  {id:"P6167",partido:"PSOE",estado:"incumplida",confianza:86,categoria:"trabajo",titulo:"Reducción de la brecha salarial de género al 10%",fuente:"Programa electoral PSOE 23J, pág. 38",fecha_analisis:"2025-12-05",valor_actual:"Brecha: 19.3% (INE 2024)",valor_objetivo:"<10%",votos:312},
+  {id:"P6245",partido:"PSOE",estado:"en_proceso",confianza:60,categoria:"educacion",titulo:"Aumento de la inversión en educación al 5% del PIB",fuente:"Programa electoral PSOE 23J, pág. 55",fecha_analisis:"2025-10-14",valor_actual:"4.1% PIB (2024)",valor_objetivo:"5% PIB",votos:267},
+  {id:"P6312",partido:"PSOE",estado:"cumplida",confianza:97,categoria:"pensiones",titulo:"Derogación del factor de sostenibilidad de las pensiones",fuente:"Acuerdo de Gobierno 2021",fecha_analisis:"2025-06-20",valor_actual:"Derogado (2023)",valor_objetivo:"Derogación",votos:298},
+  {id:"P6389",partido:"PSOE",estado:"en_proceso",confianza:68,categoria:"medioambiente",titulo:"Prohibición de venta de vehículos de combustión en 2035",fuente:"Plan de Recuperación 2021",fecha_analisis:"2025-09-08",valor_actual:"Regulación UE en curso",valor_objetivo:"Prohibición 2035",votos:189},
+  {id:"P6456",partido:"PSOE",estado:"parcial",confianza:74,categoria:"seguridad",titulo:"10.000 nuevas plazas en Policía y Guardia Civil",fuente:"Programa electoral PSOE 23J, pág. 82",fecha_analisis:"2025-11-22",valor_actual:"3.400 plazas convocadas",valor_objetivo:"10.000 plazas",votos:234},
+  {id:"P6523",partido:"PSOE",estado:"cumplida",confianza:99,categoria:"trabajo",titulo:"Extensión del IMV a familias monoparentales",fuente:"Acuerdo de Gobierno 2021",fecha_analisis:"2025-02-15",valor_actual:"IMV ampliado (2022)",valor_objetivo:"Ampliación",votos:189},
+  {id:"P7001",partido:"Sumar",estado:"en_proceso",confianza:63,categoria:"sanidad",titulo:"Ley de Salud Mental con financiación del 10% del presupuesto sanitario",fuente:"Programa electoral Sumar 23J, pág. 55",fecha_analisis:"2025-10-05",valor_actual:"Ley aprobada, dotación 4%",valor_objetivo:"10% presupuesto",votos:298},
+  {id:"P7078",partido:"Sumar",estado:"incumplida",confianza:80,categoria:"medioambiente",titulo:"Prohibición de nuevas concesiones mineras a cielo abierto",fuente:"Programa electoral Sumar 23J, pág. 92",fecha_analisis:"2025-09-14",valor_actual:"3 nuevas concesiones en 2024",valor_objetivo:"0 nuevas concesiones",votos:167},
+  {id:"P7156",partido:"Sumar",estado:"en_proceso",confianza:58,categoria:"economia",titulo:"Bono joven universal de 250€ al mes (18-23 años)",fuente:"Programa electoral Sumar 23J, pág. 18",fecha_analisis:"2025-11-30",valor_actual:"Incluido en PGE 2025, bloqueado",valor_objetivo:"Bono activo",votos:234},
+  {id:"P8001",partido:"VOX",estado:"sin_datos",confianza:0,categoria:"politica",titulo:"Aplicación permanente del Art. 155 a Cataluña",fuente:"Programa electoral VOX 23J, pág. 11",fecha_analisis:"2026-01-10",valor_actual:"VOX no gobierna",valor_objetivo:"Aplicación 155",votos:312},
+  {id:"P8078",partido:"VOX",estado:"sin_datos",confianza:0,categoria:"educacion",titulo:"Eliminación de asignaturas de educación en valores",fuente:"Programa electoral VOX 23J, pág. 48",fecha_analisis:"2026-01-10",valor_actual:"VOX no gobierna",valor_objetivo:"Eliminación",votos:156},
+  {id:"P9001",partido:"PP",estado:"sin_datos",confianza:0,categoria:"economia",titulo:"Deflactación anual del IRPF con la inflación",fuente:"Programa electoral PP 23J, pág. 10",fecha_analisis:"2026-01-10",valor_actual:"PP no gobierna (nacional)",valor_objetivo:"Deflactación anual",votos:189},
+  {id:"P9078",partido:"PP",estado:"sin_datos",confianza:0,categoria:"sanidad",titulo:"Ley de Cuidados para la atención a la dependencia",fuente:"Programa electoral PP 23J, pág. 70",fecha_analisis:"2026-01-10",valor_actual:"PP no gobierna (nacional)",valor_objetivo:"Ley Cuidados",votos:234},
+];
+
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const ESTADO_LABELS = {
+  cumplida:"Cumplida", en_proceso:"En proceso", incumplida:"Incumplida",
+  parcial:"Parcialmente cumplida", sin_datos:"Sin datos verificables"
+};
+const PARTIDO_COLORS = {
+  "PSOE":"#ef5350","PP":"#42a5f5","VOX":"#66bb6a","Sumar":"#ec407a",
+  "PSOE+Sumar":"#ff9800","PSOE+Junts":"#ab47bc","PSOE+ERC":"#7e57c2","default":"#9e9e9e"
+};
+const CAT_ICONS = {
+  economia:"📊",vivienda:"🏠",trabajo:"💼",pensiones:"🏛️",sanidad:"🏥",
+  educacion:"🎓",medioambiente:"🌿",seguridad:"🔒",politica:"⚖️",justicia:"⚖️"
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const filters = { estado: new Set(), partido: new Set(), categoria: new Set() };
+let currentSort = "votos";
+let searchQuery = "";
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function getColor(estado) {
+  const map = {
+    cumplida:"var(--c-cumplida)", en_proceso:"var(--c-proceso)",
+    incumplida:"var(--c-incumplida)", parcial:"var(--c-parcial)", sin_datos:"var(--c-sin_datos)"
+  };
+  return map[estado] || "var(--muted)";
+}
+
+function renderCard(p) {
+  const color = getColor(p.estado);
+  const pc = PARTIDO_COLORS[p.partido] || PARTIDO_COLORS.default;
+  const icon = CAT_ICONS[p.categoria] || "·";
+  const isHigh = p.votos > 400;
+  const confDisplay = p.confianza > 0
+    ? `<div class="conf-bar-wrap">
+        <div class="conf-bar-label">${p.confianza}% confianza IA</div>
+        <div class="conf-bar"><div class="conf-fill" style="width:${p.confianza}%;background:${color}"></div></div>
+       </div>`
+    : "";
+
+  return `<a class="promise-card${isHigh?" highlight":""}" href="democraticai-promesa-detalle.html" title="Ver detalle: ${p.titulo}">
+    <div class="pc-left">
+      <div class="pc-meta">
+        <span class="pc-id">${p.id}</span>
+        <span class="pc-partido" style="background:${pc}22;color:${pc};border:1px solid ${pc}44;">${p.partido}</span>
+        <span class="pc-cat">${icon} ${p.categoria}</span>
+      </div>
+      <div class="pc-title">${p.titulo}</div>
+      <div class="pc-origin">
+        <span>${p.fuente}</span>
+        <span class="pc-origin-sep"></span>
+        <span style="color:rgba(245,240,232,.4)">${p.fecha_analisis}</span>
+        ${p.valor_actual ? `<span class="pc-origin-sep"></span><span style="color:${color}80">${p.valor_actual}</span>` : ""}
+      </div>
+    </div>
+    <div class="pc-right">
+      <div class="status-pill sp-${p.estado}">${ESTADO_LABELS[p.estado]}</div>
+      ${confDisplay}
+      <div class="pc-votos">
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 1l1.5 3 3.5.5-2.5 2.5.5 3.5L6 9l-3 1.5.5-3.5L1 4.5 4.5 4z"/></svg>
+        ${p.votos}
+      </div>
+    </div>
+  </a>`;
+}
+
+function renderList() {
+  let data = [...PROMESAS];
+
+  // Search
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    data = data.filter(p =>
+      p.titulo.toLowerCase().includes(q) ||
+      p.partido.toLowerCase().includes(q) ||
+      p.categoria.toLowerCase().includes(q) ||
+      p.id.toLowerCase().includes(q) ||
+      p.fuente.toLowerCase().includes(q)
+    );
+  }
+
+  // Filters
+  if (filters.estado.size > 0) data = data.filter(p => filters.estado.has(p.estado));
+  if (filters.partido.size > 0) {
+    data = data.filter(p => {
+      for (const f of filters.partido) {
+        if (p.partido === f || p.partido.includes(f)) return true;
+      }
+      return false;
+    });
+  }
+  if (filters.categoria.size > 0) data = data.filter(p => filters.categoria.has(p.categoria));
+
+  // Sort
+  data.sort((a, b) => {
+    if (currentSort === "votos") return b.votos - a.votos;
+    if (currentSort === "confianza") return b.confianza - a.confianza;
+    if (currentSort === "fecha_analisis") return b.fecha_analisis.localeCompare(a.fecha_analisis);
+    if (currentSort === "id") return a.id.localeCompare(b.id);
+    return 0;
+  });
+
+  const list = document.getElementById("promiseList");
+  document.getElementById("resultsCount").textContent =
+    data.length + " promesa" + (data.length !== 1 ? "s" : "");
+
+  if (data.length === 0) {
+    list.innerHTML = `<div class="empty-state">
+      <div class="empty-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="8"/><path d="M10 6v4M10 14h.01"/></svg></div>
+      <div class="empty-title">Sin resultados</div>
+      <div class="empty-sub">Prueba con otros filtros o amplía la búsqueda.<br><button onclick="clearAllFilters()" style="color:var(--gold);background:none;border:none;cursor:pointer;font-size:13px;margin-top:8px;">Limpiar todos los filtros</button></div>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = data.map(renderCard).join("");
+}
+
+function renderSidebar() {
+  // Partido breakdown
+  const partidos = {};
+  PROMESAS.forEach(p => {
+    const k = p.partido.split("+")[0];
+    if (!partidos[k]) partidos[k] = {total:0, cumplidas:0};
+    partidos[k].total++;
+    if (p.estado === "cumplida") partidos[k].cumplidas++;
+  });
+  const maxTotal = Math.max(...Object.values(partidos).map(v => v.total));
+
+  document.getElementById("partidoBreakdown").innerHTML = Object.entries(partidos)
+    .sort((a,b) => b[1].total - a[1].total)
+    .map(([k,v]) => {
+      const c = PARTIDO_COLORS[k] || PARTIDO_COLORS.default;
+      const pct = Math.round(v.total/maxTotal*100);
+      const pctCump = v.total > 0 ? Math.round(v.cumplidas/v.total*100) : 0;
+      return `<div class="partido-row" onclick="toggleFilter('partido','${k}',null)">
+        <div class="pr-dot" style="background:${c}"></div>
+        <div class="pr-name">${k}</div>
+        <div class="pr-bar-wrap"><div class="pr-bar"><div class="pr-fill" style="width:${pct}%;background:${c}66"></div></div></div>
+        <div class="pr-nums">${v.total} · ${pctCump}% ✓</div>
+      </div>`;
+    }).join("");
+
+  // Trending
+  const trending = [...PROMESAS].sort((a,b) => b.votos - a.votos).slice(0,5);
+  document.getElementById("trendingList").innerHTML = trending.map((p,i) => {
+    const c = getColor(p.estado);
+    return `<div class="trend-item" onclick="document.location='democraticai-promesa-detalle.html'">
+      <div class="trend-rank">${i+1}</div>
+      <div>
+        <div class="trend-text">${p.titulo}</div>
+        <span class="trend-badge sp-${p.estado}" style="font-family:var(--mono);font-size:8px;padding:2px 6px;border-radius:2px;">${ESTADO_LABELS[p.estado]}</span>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderProgressBar() {
+  const counts = {cumplida:0, en_proceso:0, incumplida:0, parcial:0, sin_datos:0};
+  PROMESAS.forEach(p => counts[p.estado]++);
+  const total = PROMESAS.length;
+  const bar = document.getElementById("progressBar");
+  const segs = [
+    {key:"cumplida", color:"var(--c-cumplida)"},
+    {key:"en_proceso", color:"var(--c-proceso)"},
+    {key:"parcial", color:"var(--c-parcial)"},
+    {key:"incumplida", color:"var(--c-incumplida)"},
+    {key:"sin_datos", color:"var(--c-sin_datos)"},
+  ];
+  bar.innerHTML = segs.map(s =>
+    `<div class="prog-seg" style="width:${counts[s.key]/total*100}%;background:${s.color}"></div>`
+  ).join("");
+}
+
+// ── FILTER CONTROLS ───────────────────────────────────────────────────────────
+function toggleFilter(type, value, el) {
+  if (filters[type].has(value)) {
+    filters[type].delete(value);
+    if (el) el.classList.remove("active");
+  } else {
+    filters[type].add(value);
+    if (el) el.classList.add("active");
+  }
+  // Sync chip UI if clicked from sidebar
+  if (!el) {
+    document.querySelectorAll(`.chip.par-${value}`).forEach(c => {
+      filters[type].has(value) ? c.classList.add("active") : c.classList.remove("active");
+    });
+  }
+  applyFilters();
+}
+
+function filterEstado(estado, el) {
+  // Scoreboard click: exclusive filter or clear
+  if (estado === "all") {
+    filters.estado.clear();
+    document.querySelectorAll("[id^='sb-']").forEach(b => b.style.borderBottomColor = "transparent");
+    el.style.borderBottomColor = "var(--paper)";
+    document.querySelectorAll(".chip[id^='f-']").forEach(c => c.classList.remove("active"));
+  } else {
+    if (filters.estado.has(estado) && filters.estado.size === 1) {
+      filters.estado.clear();
+      el.style.borderBottomColor = "transparent";
+      document.getElementById("sb-all").style.borderBottomColor = "var(--paper)";
+      const chip = document.getElementById("f-"+estado);
+      if (chip) chip.classList.remove("active");
+    } else {
+      filters.estado.clear();
+      document.querySelectorAll("[id^='sb-']").forEach(b => b.style.borderBottomColor = "transparent");
+      el.style.borderBottomColor = getColor(estado);
+      filters.estado.add(estado);
+      document.querySelectorAll(".chip[id^='f-']").forEach(c => c.classList.remove("active"));
+      const chip = document.getElementById("f-"+estado);
+      if (chip) chip.classList.add("active");
+    }
+  }
+  applyFilters();
+}
+
+function clearAllFilters() {
+  filters.estado.clear(); filters.partido.clear(); filters.categoria.clear();
+  document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+  document.querySelectorAll("[id^='sb-']").forEach(b => b.style.borderBottomColor = "transparent");
+  document.getElementById("sb-all").style.borderBottomColor = "var(--paper)";
+  document.getElementById("searchInput").value = "";
+  searchQuery = "";
+  applyFilters();
+}
+
+function applyFilters() {
+  searchQuery = document.getElementById("searchInput").value;
+  currentSort = document.getElementById("sortSel").value;
+  renderList();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", () => {
+  renderProgressBar();
+  renderSidebar();
+  renderList();
+  // Keyboard shortcut: / to focus search
+  document.addEventListener("keydown", e => {
+    if (e.key === "/" && document.activeElement !== document.getElementById("searchInput")) {
+      e.preventDefault();
+      document.getElementById("searchInput").focus();
+    }
+  });
+});
+</script>
+</body>
+</html>
