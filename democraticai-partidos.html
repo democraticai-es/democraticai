@@ -22,7 +22,10 @@
   --cs:#FF8F00;   --cs-dim:rgba(255,143,0,0.12);   --cs-mid:rgba(255,143,0,0.35);
 }
 
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+/* Prevent browser default link colors */
+  a:link, a:visited { color: inherit; text-decoration: none; }
+  a:hover { opacity: 0.85; }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
 body{font-family:var(--sans);background:var(--ink);color:var(--paper);overflow-x:hidden;}
 body::before{content:'';position:fixed;inset:0;
@@ -33,11 +36,11 @@ body::before{content:'';position:fixed;inset:0;
 .masthead{border-bottom:1px solid var(--rule);padding:0 clamp(16px,3vw,52px);display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;background:rgba(15,14,12,0.97);backdrop-filter:blur(12px);}
 .masthead-left{display:flex;align-items:center;gap:16px;}
 .back-link{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,240,232,.7);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color .2s;}
-.back-link:hover{color:var(--paper);}
+.back-link:visited{color:rgba(245,240,232,.7);text-decoration:none;}.back-link:visited{color:rgba(245,240,232,.7);text-decoration:none;}.back-link:hover{color:#f5f0e8;}
 .sep-v{width:1px;height:14px;background:var(--rule);}
 .bc{font-family:var(--mono);font-size:10px;color:rgba(245,240,232,.6);}
 .bc span{color:rgba(245,240,232,.4);}
-.wm{font-family:var(--serif);font-weight:700;font-size:16px;color:#f5f0e8;text-decoration:none;}
+.wm:visited{color:#f5f0e8;text-decoration:none;}.wm{font-family:var(--serif);font-weight:700;font-size:16px;color:#f5f0e8;text-decoration:none;}
 .wm em{color:var(--red);font-style:normal;}
 
 /* PAGE */
@@ -177,6 +180,10 @@ body::before{content:'';position:fixed;inset:0;
 @media(max-width:1000px){.comparison-grid{grid-template-columns:1fr 1fr;}.party-selector{grid-template-columns:repeat(3,1fr);}}
 @media(max-width:700px){.comparison-grid{grid-template-columns:1fr;}.party-selector{grid-template-columns:repeat(2,1fr);}.h2h-row{grid-template-columns:1fr 60px 1fr;}.h2h-val.left,.h2h-val.right{display:none;}}
 @media(max-width:480px){.party-selector{grid-template-columns:1fr 1fr;}}
+  .masthead-global-nav { display:flex; gap:20px; list-style:none; }
+  .masthead-global-nav a { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:rgba(245,240,232,.82) !important; text-decoration:none !important; transition:color .2s; }
+  .masthead-global-nav a:hover, .masthead-global-nav a:visited, .masthead-global-nav a:active { color:rgba(245,240,232,.82) !important; text-decoration:none !important; }
+  .masthead-global-nav a:hover { color:#f5f0e8 !important; }
 </style>
   <meta name="description" content="Compara el cumplimiento de promesas electorales de PSOE, PP, VOX, Sumar y Cs. Datos del BOE, análisis auditable, sin agenda editorial.">
   <meta property="og:title" content="¿Qué partido cumple más sus promesas? — DemocraticAI">
@@ -198,10 +205,10 @@ body::before{content:'';position:fixed;inset:0;
     <div class="sep-v"></div>
     <div class="bc">Dashboard <span>›</span> Partidos</div>
   </div>
-  <nav style="display:flex;gap:20px;list-style:none;">
-      <a href="democraticai.html" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(245,240,232,.82);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f5f0e8'" onmouseout="this.style.color='rgba(245,240,232,.82)'">Inicio</a>
-      <a href="democraticai-partidos.html" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(245,240,232,.82);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f5f0e8'" onmouseout="this.style.color='rgba(245,240,232,.82)'">Partidos</a>
-      <a href="democraticai-economia.html" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(245,240,232,.82);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f5f0e8'" onmouseout="this.style.color='rgba(245,240,232,.82)'">Economía</a>
+  <nav class="masthead-global-nav">
+      <a href="democraticai.html">Inicio</a>
+      <a href="democraticai-partidos.html">Partidos</a>
+      <a href="democraticai-economia.html">Economía</a>
     </nav>
   <a href="democraticai.html" class="wm">Democratic<em>AI</em></a>
   <div style="font-family:var(--mono);font-size:10px;color:rgba(245,240,232,.65)">XIV Legislatura · 2023–</div>
